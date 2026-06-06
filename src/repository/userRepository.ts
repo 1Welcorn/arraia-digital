@@ -12,8 +12,8 @@ export const userRepository = {
   async seedDefaultUsers(): Promise<void> {
     const count = await db.usuarios_sistema.count();
     if (count === 0) {
-      const superAdminPin = await sha256('112233');
-      const adminPin = await sha256('445566');
+      const superAdminPin = await sha256('654321');
+      const adminPin = await sha256('654321');
       const operadorPin = await sha256('123456');
 
       await db.usuarios_sistema.bulkAdd([
@@ -47,7 +47,7 @@ export const userRepository = {
     const williansEmail = 'willians.souza@escola.pr.gov.br';
     const hasWillians = await db.usuarios_sistema.get(williansEmail);
     if (!hasWillians) {
-      const williansPin = await sha256('123456');
+      const williansPin = await sha256('654321');
       await db.usuarios_sistema.put({
         email: williansEmail,
         nome: 'Willians Souza - Diretor',
