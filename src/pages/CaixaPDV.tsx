@@ -113,6 +113,9 @@ export function CaixaPDV() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  // Mobile Layout
+  const [isCartOpenMobile, setIsCartOpenMobile] = useState(false);
+
   useEffect(() => {
     // Carrega usuário
     const currentUser = authLocalService.getCurrentUser();
@@ -759,7 +762,7 @@ export function CaixaPDV() {
           // OPERAÇÃO DO CAIXA (PDV GRID + CARRINHO)
           <>
             {/* GRID DE PRODUTOS */}
-            <div className="flex-1 flex flex-col p-6 overflow-hidden">
+            <div className="flex-1 flex flex-col p-4 md:p-6 pb-28 lg:pb-6 overflow-hidden relative">
               
               {/* FILTROS E ORDENAÇÃO */}
               <div className="flex items-center justify-between gap-4 mb-4 bg-slate-950/30 p-2 rounded-2xl border border-slate-800/60 overflow-x-auto pb-1 scrollbar-none">
@@ -806,7 +809,7 @@ export function CaixaPDV() {
               )}
 
               {/* LISTA DE PRODUTOS */}
-              <div className="flex-1 overflow-y-auto pr-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 align-content-start">
+              <div className="flex-1 overflow-y-auto pr-1 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4 align-content-start">
                 {sortedProducts.map((product) => {
                   const inCartQty = cart.find((item) => item.product.id === product.id)?.quantity || 0;
                   return (
@@ -856,11 +859,26 @@ export function CaixaPDV() {
               </div>
             </div>
 
-            {/* CARRINHO DE COMPRAS & TROCO (PAINEL DIREITO) */}
-            <div className="w-96 border-l border-slate-800 bg-slate-950 flex flex-col shadow-2xl">
+            {/* CARRINHO DE COMPRAS & TROCO (PAINEL DIREITO NO DESKTOP / OVERLAY NO MOBILE) */}
+            <div className={`
+              fixed inset-0 z-50 lg:static lg:inset-auto lg:z-auto
+              ${isCartOpenMobile ? 'flex' : 'hidden lg:flex'}
+              w-full lg:w-96 border-l border-slate-800 bg-slate-950 flex-col shadow-2xl
+            `}>
               
-              {/* TOPO DO CARRINHO */}
-              <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+              {/* HEADER MOBILE FECHAR */}
+              <div className="lg:hidden p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950">
+                <span className="font-extrabold text-lg text-white">Sacola de Vendas</span>
+                <button 
+                  onClick={() => setIsCartOpenMobile(false)}
+                  className="p-2 bg-slate-800 rounded-full text-slate-300 hover:text-white"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* TOPO DO CARRINHO (DESKTOP) */}
+              <div className="hidden lg:flex p-4 border-b border-slate-800 items-center justify-between">
                 <div className="flex items-center gap-2">
                   <ShoppingCart className="text-amber-500" size={20} />
                   <span className="font-extrabold text-lg">Comandas / Sacola</span>
@@ -1014,6 +1032,23 @@ export function CaixaPDV() {
 
               </div>
             </div>
+
+            {/* BARRA FLUTUANTE DE SACOLA (APENAS MOBILE) */}
+            {!isCartOpenMobile && cart.length > 0 && (
+              <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-slate-950 border-t border-slate-800 p-4 pb-6 flex items-center justify-between z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+                <div className="flex flex-col">
+                  <span className="text-xs text-slate-400 font-bold">{cart.reduce((a, b) => a + b.quantity, 0)} itens na sacola</span>
+                  <span className="text-xl font-black text-amber-500">R$ {cartTotal.toFixed(2)}</span>
+                </div>
+                <button 
+                  onClick={() => setIsCartOpenMobile(true)}
+                  className="bg-amber-500 text-slate-950 px-6 py-3 rounded-xl font-black shadow-lg shadow-amber-500/20 flex items-center gap-2 active:scale-95 transition-transform"
+                >
+                  <ShoppingCart size={18} />
+                  Ver Sacola
+                </button>
+              </div>
+            )}
           </>
         )}
       </main>
