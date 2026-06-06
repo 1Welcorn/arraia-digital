@@ -765,15 +765,15 @@ export function CaixaPDV() {
             <div className="flex-1 flex flex-col p-4 md:p-6 pb-28 lg:pb-6 overflow-hidden relative">
               
               {/* FILTROS E ORDENAÇÃO */}
-              <div className="flex items-center justify-between gap-4 mb-4 bg-slate-950/30 p-2 rounded-2xl border border-slate-800/60 overflow-x-auto pb-1 scrollbar-none">
+              <div className="flex items-center justify-between gap-4 mb-4 bg-slate-950/30 p-2.5 rounded-2xl border border-slate-800/60 overflow-x-auto pb-2 scrollbar-none">
                 <div className="flex items-center gap-2">
                   {(['tudo', 'comida', 'bebida', 'doce', 'jogo'] as const).map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
-                      className={`px-4 py-2 rounded-xl text-xs font-bold capitalize transition-all duration-150 border cursor-pointer whitespace-nowrap ${
+                      className={`px-5 py-3 rounded-xl text-sm font-black capitalize transition-all duration-150 border cursor-pointer whitespace-nowrap ${
                         activeTab === tab
-                          ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md font-extrabold'
+                          ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md scale-105'
                           : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white hover:border-slate-700'
                       }`}
                     >
@@ -809,7 +809,7 @@ export function CaixaPDV() {
               )}
 
               {/* LISTA DE PRODUTOS */}
-              <div className="flex-1 overflow-y-auto pr-1 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4 align-content-start">
+              <div className="flex-1 overflow-y-auto pr-1 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 align-content-start">
                 {sortedProducts.map((product) => {
                   const inCartQty = cart.find((item) => item.product.id === product.id)?.quantity || 0;
                   return (
@@ -817,24 +817,24 @@ export function CaixaPDV() {
                       key={product.id}
                       onClick={() => handleAddToCart(product)}
                       disabled={product.ativo === 0}
-                      className={`group relative overflow-hidden flex items-center justify-between p-3 h-36 rounded-2xl border text-left transition-all duration-200 active:scale-[0.97] shadow-lg ${
+                      className={`group relative overflow-hidden flex items-center justify-between p-4 h-auto min-h-[120px] rounded-2xl border text-left transition-all duration-200 active:scale-[0.98] shadow-lg ${
                         product.ativo === 0
                           ? 'opacity-40 bg-slate-950 border-slate-900 cursor-not-allowed'
                           : `${product.cor_ficha} cursor-pointer hover:-translate-y-1 hover:shadow-xl`
                       }`}
                     >
-                      <div className="flex-1 flex flex-col justify-between h-full pr-3 min-w-0">
-                        <div className="flex flex-col">
-                          <span className="font-black text-lg leading-snug line-clamp-2 text-white drop-shadow-sm">
+                      <div className="flex-1 flex flex-col justify-center h-full pr-4 min-w-0">
+                        <div className="flex flex-col mb-2">
+                          <span className="font-black text-xl leading-snug line-clamp-2 text-white drop-shadow-sm">
                             {product.nome}
                           </span>
-                          <span className="text-[11px] opacity-80 font-black uppercase mt-0.5 tracking-wider">
+                          <span className="text-xs opacity-80 font-black uppercase mt-1 tracking-wider">
                             {product.categoria}
                           </span>
                         </div>
 
-                        <div className="flex items-center justify-between w-full mt-2">
-                          <span className="text-xl font-black tracking-tight text-white drop-shadow">
+                        <div className="flex items-center justify-between w-full mt-auto">
+                          <span className="text-2xl font-black tracking-tight text-white drop-shadow">
                             R$ {product.preco.toFixed(2)}
                           </span>
                         </div>
@@ -842,14 +842,14 @@ export function CaixaPDV() {
 
                       {/* Imagem Ilustrativa da Categoria */}
                       {product.imagem && (
-                        <div className="w-28 h-28 flex-shrink-0 rounded-xl overflow-hidden border border-black/15 bg-slate-900/10 flex items-center justify-center shadow-inner transition-transform duration-300 group-hover:scale-105">
+                        <div className="w-24 h-24 sm:w-28 sm:h-28 flex-shrink-0 rounded-xl overflow-hidden border border-black/15 bg-slate-900/10 flex items-center justify-center shadow-inner transition-transform duration-300 group-hover:scale-105">
                           <img src={product.imagem} alt={product.nome} className="w-full h-full object-cover" />
                         </div>
                       )}
 
                       {/* BADGE DE QUANTIDADE NO CARRINHO */}
                       {inCartQty > 0 && (
-                        <div className="absolute top-2 right-2 flex items-center justify-center w-6 h-6 rounded-full bg-slate-950 text-white border border-white/20 text-xs font-black animate-scale-up z-10">
+                        <div className="absolute top-3 right-3 flex items-center justify-center w-8 h-8 rounded-full bg-slate-950 text-white border-2 border-white/20 text-sm font-black animate-scale-up z-10 shadow-xl">
                           {inCartQty}
                         </div>
                       )}
@@ -910,27 +910,27 @@ export function CaixaPDV() {
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         <button
                           onClick={() => handleDecrementCart(item.product.id)}
-                          className="p-1 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors cursor-pointer"
+                          className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors cursor-pointer active:scale-95 shadow-sm"
                         >
-                          <Minus size={14} />
+                          <Minus size={20} />
                         </button>
-                        <span className="text-sm font-black w-4 text-center">
+                        <span className="text-lg font-black w-6 text-center">
                           {item.quantity}
                         </span>
                         <button
                           onClick={() => handleIncrementCart(item.product.id)}
-                          className="p-1 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors cursor-pointer"
+                          className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-700 text-white transition-colors cursor-pointer active:scale-95 shadow-sm"
                         >
-                          <Plus size={14} />
+                          <Plus size={20} />
                         </button>
                         <button
                           onClick={() => handleRemoveFromCart(item.product.id)}
-                          className="p-1 rounded-md bg-red-950/50 hover:bg-red-900/30 text-rose-400 ml-1 transition-colors cursor-pointer"
+                          className="w-10 h-10 flex items-center justify-center rounded-xl bg-red-950/60 hover:bg-red-900/50 text-rose-400 ml-2 transition-colors cursor-pointer active:scale-95 shadow-sm"
                         >
-                          <Trash2 size={14} />
+                          <Trash2 size={18} />
                         </button>
                       </div>
                     </div>
@@ -952,41 +952,41 @@ export function CaixaPDV() {
                 {/* PAINEL DE DINHEIRO & TROCO REMOVIDO DAQUI (AGORA ESTÁ NO MODAL) */}
 
                 {/* BOTÕES DE FINALIZAÇÃO */}
-                <div className="grid grid-cols-3 gap-2 pt-2">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
                   <button
                     onClick={handleFinalizarDinheiro}
                     disabled={cart.length === 0}
-                    className={`flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl text-[11px] font-extrabold transition-all active:scale-[0.98] ${
+                    className={`flex md:flex-col items-center justify-center gap-3 md:gap-1.5 py-4 md:py-3 rounded-xl text-sm md:text-xs font-black transition-all active:scale-[0.98] ${
                       cart.length > 0
-                        ? 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-md cursor-pointer'
+                        ? 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-lg cursor-pointer'
                         : 'bg-slate-800 text-slate-500 cursor-not-allowed'
                     }`}
                   >
-                    <DollarSign size={15} /> Dinheiro
+                    <DollarSign size={20} /> Dinheiro
                   </button>
                   
                   <button
                     onClick={handleGerarPix}
                     disabled={cart.length === 0}
-                    className={`flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl text-[11px] font-extrabold transition-all active:scale-[0.98] ${
+                    className={`flex md:flex-col items-center justify-center gap-3 md:gap-1.5 py-4 md:py-3 rounded-xl text-sm md:text-xs font-black transition-all active:scale-[0.98] ${
                       cart.length > 0
-                        ? 'bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-md cursor-pointer'
+                        ? 'bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-lg cursor-pointer'
                         : 'bg-slate-800 text-slate-500 cursor-not-allowed'
                     }`}
                   >
-                    <QrCode size={15} /> Pix Offline
+                    <QrCode size={20} /> Pix Offline
                   </button>
 
                   <button
                     onClick={handleFinalizarCartao}
                     disabled={cart.length === 0}
-                    className={`flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl text-[11px] font-extrabold transition-all active:scale-[0.98] ${
+                    className={`flex md:flex-col items-center justify-center gap-3 md:gap-1.5 py-4 md:py-3 rounded-xl text-sm md:text-xs font-black transition-all active:scale-[0.98] ${
                       cart.length > 0
-                        ? 'bg-purple-600 text-white hover:bg-purple-500 shadow-md cursor-pointer'
+                        ? 'bg-purple-600 text-white hover:bg-purple-500 shadow-lg cursor-pointer'
                         : 'bg-slate-800 text-slate-500 cursor-not-allowed'
                     }`}
                   >
-                    <CreditCard size={15} /> Cartão
+                    <CreditCard size={20} /> Cartão
                   </button>
                 </div>
 
@@ -1035,17 +1035,18 @@ export function CaixaPDV() {
 
             {/* BARRA FLUTUANTE DE SACOLA (APENAS MOBILE) */}
             {!isCartOpenMobile && cart.length > 0 && (
-              <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-slate-950 border-t border-slate-800 p-4 pb-6 flex items-center justify-between z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
-                <div className="flex flex-col">
-                  <span className="text-xs text-slate-400 font-bold">{cart.reduce((a, b) => a + b.quantity, 0)} itens na sacola</span>
-                  <span className="text-xl font-black text-amber-500">R$ {cartTotal.toFixed(2)}</span>
-                </div>
+              <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-md border-t border-slate-800 p-4 pb-6 flex items-center z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
                 <button 
                   onClick={() => setIsCartOpenMobile(true)}
-                  className="bg-amber-500 text-slate-950 px-6 py-3 rounded-xl font-black shadow-lg shadow-amber-500/20 flex items-center gap-2 active:scale-95 transition-transform"
+                  className="w-full bg-amber-500 text-slate-950 px-6 py-4 rounded-2xl font-black shadow-lg shadow-amber-500/20 flex items-center justify-between active:scale-[0.98] transition-transform"
                 >
-                  <ShoppingCart size={18} />
-                  Ver Sacola
+                  <div className="flex items-center gap-3">
+                    <div className="bg-slate-950 text-white w-8 h-8 flex items-center justify-center rounded-full text-xs font-bold border border-amber-400">
+                      {cart.reduce((a, b) => a + b.quantity, 0)}
+                    </div>
+                    <span className="text-lg">Ver Sacola</span>
+                  </div>
+                  <span className="text-2xl">R$ {cartTotal.toFixed(2)}</span>
                 </button>
               </div>
             )}
