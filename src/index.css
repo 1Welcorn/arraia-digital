@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+/* Garante que o aplicativo se comporte como um app nativo, sem barras de rolagem bobas */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #0f172a; /* Um fundo escuro ardósia elegante */
+  font-family: system-ui, -apple-system, sans-serif;
+  -webkit-user-select: none; /* Evita que o operador fique selecionando textos por acidente */
+  user-select: none;
+}
+
+@media print {
+  /* Reset para papel branco */
+  html, body, #root, .flex-1, .overflow-y-auto, .overflow-hidden, .h-full, .w-full {
+    height: auto !important;
+    width: auto !important;
+    overflow: visible !important;
+    background-color: white !important;
+    color: black !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Esconder barras laterais e cabeçalho inútil no PDF */
+  .print-hidden, nav, header, button {
+    display: none !important;
+  }
+
+  /* Limpar as cores Dark Mode para o papel */
+  * {
+    color: black !important;
+    border-color: #aaa !important;
+    box-shadow: none !important;
+  }
+  
+  .bg-slate-900, .bg-slate-950, .bg-slate-800, .bg-rose-500\/10, .bg-emerald-500\/10 {
+    background-color: transparent !important;
+  }
+
+  /* Formatar a tabela para prestação de contas */
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    margin-top: 15px !important;
+  }
+  
+  th, td {
+    border: 1px solid #aaa !important;
+    padding: 8px !important;
+  }
+}

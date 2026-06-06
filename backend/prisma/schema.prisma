@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+
+model User {
+  email      String   @id
+  nome       String
+  pin_acesso String
+  role       String   @default("OPERADOR") // OPERADOR, ADMIN_OPERACIONAL, SUPER_ADMIN
+  created_at DateTime @default(now())
+}
+
+model Product {
+  id        String   @id @default(uuid())
+  nome      String
+  categoria String   // DOCES, BEBIDAS, JOGOS, COMIDAS
+  preco     Float
+  cor_ficha String
+  ativo     Int      @default(1)
+  imagem    String?
+  SaleItem  SaleItem[]
+}
+
+model Sale {
+  id               String     @id
+  device_id        String
+  valor_total      Float
+  metodo_pagamento String     // DINHEIRO, PIX_LOCAL, CORTESIA, CARTAO
+  codigo_pix       String?
+  valor_pago       Float?
+  troco            Float?
+  criado_em        String
+  synced_at        DateTime   @default(now())
+  
+  items            SaleItem[]
+}
+
+model SaleItem {
+  id             String  @id
+  venda_id       String
+  produto_id     String
+  quantidade     Int
+  preco_unitario Float
+
+  sale           Sale    @relation(fields: [venda_id], references: [id])
+  product        Product @relation(fields: [produto_id], references: [id])
+}
+
+model CaixaSession {
+  id                  String   @id
+  operadorEmail       String
+  status              String   // aberto, fechado
+  valorAbertura       Float
+  valorFechamento     Float?
+  timestampAbertura   Float    // Float is used to store JS Date.now() without BigInt serialization issues
+  timestampFechamento Float?
+  observacoes         String?
+  
+  // Guardando sangrias e suprimentos como JSON string
+  sangriasJson        String?  @default("[]")
+  suprimentosJson     String?  @default("[]")
+  
+  synced_at           DateTime @default(now())
+}
+
+model Message {
+  id                String   @id
+  tipo              String   // GERAL, INDIVIDUAL
+  destinatarioEmail String?
+  remetente         String
+  conteudo          String
+  timestamp         Float
+  
+  lida              Boolean  @default(false)
+}
