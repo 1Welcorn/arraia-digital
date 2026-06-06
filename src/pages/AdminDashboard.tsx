@@ -247,6 +247,9 @@ export function AdminDashboard() {
       await productRepository.saveProduct(updated);
       setEditingProduct(null);
       await loadData();
+
+      // Dispara a sincronização imediatamente para Nuvem
+      syncEngine.syncNow().catch(() => {});
     } catch (err) {
       console.error(err);
       alert('Erro ao salvar produto.');

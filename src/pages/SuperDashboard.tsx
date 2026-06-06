@@ -16,6 +16,7 @@ import type { UserSession } from '../services/authLocalService';
 import { userRepository, sha256 } from '../repository/userRepository';
 import { db } from '../database/DatabaseConnection';
 import type { UsuarioSistema } from '../database/DatabaseConnection';
+import { syncEngine } from '../services/syncEngine';
 
 export function SuperDashboard() {
   const navigate = useNavigate();
@@ -93,6 +94,9 @@ export function SuperDashboard() {
         ativo: 1,
       });
 
+      // Dispara a sincronização imediatamente para jogar a pessoa na Nuvem (Whitelist Dinâmica)
+      syncEngine.syncNow().catch(() => {});
+
       setNewEmail('');
       setNewName('');
       setNewPin('');
@@ -116,6 +120,10 @@ export function SuperDashboard() {
       await userRepository.deleteUser(email);
       setSuccess('Usuário removido da Whitelist.');
       await loadUsers();
+      
+      // Tenta sincronizar (Nota: a API atual de push upsert não deleta na nuvem, seria necessária uma rota DELETE, mas garantimos o PUSH)
+      syncEngine.syncNow().catch(() => {});
+
       setTimeout(() => setSuccess(''), 4000);
     } catch (err) {
       setError('Erro ao remover usuário.');
