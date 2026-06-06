@@ -71,7 +71,27 @@ class SyncEngineManager {
     }
   }
 
-  // Executa a sincronização bi-direcional (Push/Pull)
+  // Puxa apenas a Whitelist de Usuários (usado na tela de login)
+  async syncUsersOnly(): Promise<void> {
+    if (!this.online) return;
+    try {
+      const usersRes = await apiClient.get('/sync/users');
+      if (usersRes.data && Array.isArray(usersRes.data)) {
+        const mappedUsers = usersRes.data.map((u: any) => ({
+          email: u.email,
+          nome: u.nome,
+          pin_acesso: u.pin_acesso,
+          nivel_acesso: u.role,
+          ativo: 1
+        }));
+        await db.usuarios_sistema.bulkPut(mappedUsers);
+      }
+    } catch (err) {
+      console.warn('[Sync] Falha ao baixar Whitelist de usuários da nuvem');
+    }
+  }
+
+  // Executa a sincronização bi-direcional completa (Push/Pull)
   async syncNow(): Promise<void> {
     if (this.isSyncing) return;
     if (!this.online) {
@@ -105,6 +125,20 @@ class SyncEngineManager {
         await apiClient.post('/sync/sessions', allSessions);
       }
 
+      // 2.1 PUSH DE USUÁRIOS (Whitelist)
+      const allUsers = await db.usuarios_sistema.toArray();
+      if (allUsers.length > 0) {
+        console.log(`[Sync] Enviando ${allUsers.length} usuários para a nuvem...`);
+        try { await apiClient.post('/sync/users', allUsers); } catch(e) {}
+      }
+
+      // 2.2 PUSH DE PRODUTOS
+      const allProducts = await db.produtos.toArray();
+      if (allProducts.length > 0) {
+        console.log(`[Sync] Enviando ${allProducts.length} produtos para a nuvem...`);
+        try { await apiClient.post('/sync/products', allProducts); } catch(e) {}
+      }
+
       // 3. PULL DE PRODUTOS
       try {
         const prodRes = await apiClient.get('/sync/products');
@@ -125,6 +159,9 @@ class SyncEngineManager {
       } catch (err) {
         console.warn('[Sync] Falha ao buscar novas mensagens');
       }
+
+      // 5. PULL DE USUÁRIOS
+      await this.syncUsersOnly();
 
     } catch (err) {
       console.error('[Sync] Falha geral na sincronização com a Nuvem:', err);

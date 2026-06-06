@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authLocalService } from '../services/authLocalService';
+import { syncEngine } from '../services/syncEngine';
 
 export function LoginScreen() {
   const navigate = useNavigate();
@@ -19,6 +20,11 @@ export function LoginScreen() {
       }
     }
   }, [navigate]);
+
+  // Ao abrir o app (mesmo deslogado), tenta baixar os usuários mais recentes da Whitelist
+  useEffect(() => {
+    syncEngine.syncUsersOnly().catch(() => {});
+  }, []);
 
   const handleAutocompletarEmail = () => {
     if (!usuario.includes('@')) {

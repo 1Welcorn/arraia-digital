@@ -106,6 +106,16 @@ const authenticateToken = (req: any, res: any, next: any) => {
 // ROTAS DE SINCRONIZAÇÃO (PULL)
 // ==========================================
 
+// Puxar lista de usuários (Whitelist) - Rota ABERTA para novos tablets
+app.get('/api/sync/users', async (req, res) => {
+  try {
+    const users = await prisma.user.findMany();
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar usuários' });
+  }
+});
+
 // Puxar produtos mais recentes
 app.get('/api/sync/products', authenticateToken, async (req, res) => {
   try {
@@ -139,6 +149,46 @@ app.get('/api/sync/messages', authenticateToken, async (req: any, res) => {
 // ==========================================
 // ROTAS DE SINCRONIZAÇÃO (PUSH)
 // ==========================================
+
+// Sincronizar usuários (Admin -> Nuvem)
+app.post('/api/sync/users', authenticateToken, async (req, res) => {
+  try {
+    const users = req.body;
+    if (!Array.isArray(users)) return res.status(400).json({ error: 'Body deve ser um array' });
+
+    for (const u of users) {
+      await prisma.user.upsert({
+        where: { email: u.email },
+        update: { nome: u.nome, pin_acesso: u.pin_acesso, role: u.nivel_acesso },
+        create: { email: u.email, nome: u.nome, pin_acesso: u.pin_acesso, role: u.nivel_acesso }
+      });
+    }
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Erro no sync de usuários:', error);
+    res.status(500).json({ error: 'Erro interno ao sincronizar usuários' });
+  }
+});
+
+// Sincronizar produtos (Admin -> Nuvem)
+app.post('/api/sync/products', authenticateToken, async (req, res) => {
+  try {
+    const products = req.body;
+    if (!Array.isArray(products)) return res.status(400).json({ error: 'Body deve ser um array' });
+
+    for (const p of products) {
+      await prisma.product.upsert({
+        where: { id: p.id },
+        update: { nome: p.nome, categoria: p.categoria, preco: p.preco, cor_ficha: p.cor_ficha, ativo: p.ativo, imagem: p.imagem },
+        create: { id: p.id, nome: p.nome, categoria: p.categoria, preco: p.preco, cor_ficha: p.cor_ficha, ativo: p.ativo, imagem: p.imagem }
+      });
+    }
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Erro no sync de produtos:', error);
+    res.status(500).json({ error: 'Erro interno ao sincronizar produtos' });
+  }
+});
 
 // Receber array de vendas do modo offline (PDV -> Nuvem)
 app.post('/api/sync/sales', authenticateToken, async (req, res) => {
