@@ -66,6 +66,7 @@ export function CaixaPDV() {
   // Estados de Abertura de Caixa
   const [openingBalance, setOpeningBalance] = useState<string>('');
   const [adminPin, setAdminPin] = useState('');
+  const [adminPinClose, setAdminPinClose] = useState('');
   
   // Pagamento & Troco
   const [cashPaid, setCashPaid] = useState<string>('');
@@ -258,6 +259,7 @@ export function CaixaPDV() {
     setError('');
     setCountedCash('');
     setCloseNotes('');
+    setAdminPinClose('');
     await loadCaixaStats();
     setCloseCaixaModalOpen(true);
   };
@@ -272,7 +274,24 @@ export function CaixaPDV() {
       return;
     }
 
+    if (!adminPinClose) {
+      setError('A assinatura (PIN) do Gerente é obrigatória para fechar o caixa!');
+      return;
+    }
+
     try {
+      const pinHash = await sha256(adminPinClose);
+      const allUsers = await userRepository.getAllUsers();
+      const adminAuth = allUsers.find(u => 
+        (u.nivel_acesso === 'SUPER_ADMIN' || u.nivel_acesso === 'ADMIN_OPERACIONAL') && 
+        u.pin_acesso === pinHash
+      );
+
+      if (!adminAuth) {
+        setError('PIN inválido ou usuário sem permissão de Gerência!');
+        return;
+      }
+
       const salesList = await saleRepository.getAllSales();
       const sessionSales = salesList.filter(
         (s) => new Date(s.criado_em).getTime() >= (activeSession?.timestampAbertura || 0)
@@ -1395,23 +1414,42 @@ export function CaixaPDV() {
 
             {/* DIGITAÇÃO DO VALOR REAL CONTADO */}
             <div className="mb-4 text-left space-y-3">
-              <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1.5">Dinheiro Físico Contado na Gaveta (R$)</label>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-2.5 text-sm font-bold text-slate-500">R$</span>
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    placeholder="0,00"
-                    value={countedCash}
-                    onChange={(e) => {
-                      setCountedCash(e.target.value);
-                      setError('');
-                    }}
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 pl-10 pr-4 py-2.5 text-lg font-bold text-white focus:outline-none focus:border-amber-400"
-                    required
-                    autoFocus
-                  />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 mb-1.5">Dinheiro Físico Contado (R$)</label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-2.5 text-sm font-bold text-emerald-500">R$</span>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      placeholder="0,00"
+                      value={countedCash}
+                      onChange={(e) => setCountedCash(e.target.value)}
+                      className="w-full rounded-xl border border-emerald-500/30 bg-slate-950 pl-10 pr-4 py-2.5 text-lg font-bold text-emerald-400 focus:outline-none focus:border-emerald-400"
+                      required
+                      autoFocus
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 mb-1.5 flex justify-between">
+                    Assinatura (PIN)
+                    <span className="text-[10px] bg-rose-500/10 text-rose-400 px-1 rounded uppercase">Obrigatório</span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-3 text-slate-500"><Key size={16} /></span>
+                    <input
+                      type="password"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={6}
+                      placeholder="••••••"
+                      value={adminPinClose}
+                      onChange={(e) => setAdminPinClose(e.target.value.replace(/\D/g, ''))}
+                      className="w-full rounded-xl border border-slate-800 bg-slate-950 pl-10 pr-4 py-2.5 text-lg tracking-widest font-bold text-white focus:outline-none focus:border-rose-400"
+                    />
+                  </div>
                 </div>
               </div>
 
