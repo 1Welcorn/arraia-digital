@@ -40,7 +40,7 @@ export function SuperDashboard() {
   useEffect(() => {
     // Apenas super_admins podem acessar
     const user = authLocalService.getCurrentUser();
-    if (!user || user.nivel_acesso !== 'SUPER_ADMIN') {
+    if (!user || user.role !== 'SUPER_ADMIN') {
       navigate('/login');
       return;
     }
