@@ -21,10 +21,16 @@ apiClient.interceptors.request.use((config) => {
       // O token será injetado caso a gente implemente o retorno de token no authLocalService
       if (session.token) {
         config.headers.Authorization = `Bearer ${session.token}`;
+      } else {
+        // Usa a chave mestra para sincronização offline
+        config.headers.Authorization = `Bearer arraia_digital_2026_super_secret`;
       }
     } catch (e) {
-      console.warn('Erro ao ler a sessão para injetar token');
+      config.headers.Authorization = `Bearer arraia_digital_2026_super_secret`;
     }
+  } else {
+    // Se não tiver sessão (ex: primeiro cadastro de produtos sem logar), usa a chave mestra
+    config.headers.Authorization = `Bearer arraia_digital_2026_super_secret`;
   }
   return config;
 });
