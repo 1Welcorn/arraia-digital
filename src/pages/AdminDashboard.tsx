@@ -24,7 +24,7 @@ import { saleRepository } from '../repository/saleRepository';
 import type { LocalCaixaSession } from '../repository/saleRepository';
 import { messageRepository } from '../repository/messageRepository';
 import { db } from '../database/DatabaseConnection';
-import type { Produto, Venda, ItemVenda, Mensagem } from '../database/DatabaseConnection';
+import type { Produto, Venda, ItemVenda } from '../database/DatabaseConnection';
 import { syncEngine } from '../services/syncEngine';
 import { apiClient } from '../services/apiClient';
 import { useLiveQuery } from 'dexie-react-hooks';
