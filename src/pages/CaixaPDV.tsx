@@ -335,11 +335,50 @@ export function CaixaPDV() {
         vCartao
       );
 
+      // GERAR RELATÓRIO DE BACKUP DE SEGURANÇA
+      const reportText = `===========================================
+RELATÓRIO DE FECHAMENTO DE CAIXA (BACKUP DE SEGURANÇA)
+===========================================
+Operador: ${activeSession?.operadorEmail || 'Desconhecido'}
+Data de Abertura: ${new Date(activeSession?.timestampAbertura || Date.now()).toLocaleString()}
+Data de Fechamento: ${new Date().toLocaleString()}
+-------------------------------------------
+1. RESUMO FINANCEIRO ESTIMADO (SISTEMA)
+Valor de Abertura: R$ ${(activeSession?.valorAbertura || 0).toFixed(2)}
+Vendas em Dinheiro: R$ ${vDinheiro.toFixed(2)}
+Vendas em Pix: R$ ${vPix.toFixed(2)}
+Vendas em Cartão: R$ ${vCartao.toFixed(2)}
+Total de Suprimentos (+): R$ ${tSuprimentos.toFixed(2)}
+Total de Sangrias (-): R$ ${tSangrias.toFixed(2)}
+-------------------------------------------
+> TOTAL ESTIMADO EM GAVETA (Dinheiro + Abertura + Sup - San): R$ ${dEstimado.toFixed(2)}
+-------------------------------------------
+2. CONTAGEM REAL (OPERADOR/GERENTE)
+Valor Contado na Gaveta: R$ ${parsedContado.toFixed(2)}
+Divergência (Falta/Sobra): R$ ${dif.toFixed(2)}
+-------------------------------------------
+Observações do Fechamento:
+${msgFechamento}
+===========================================
+ARQUIVO DE SEGURANÇA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
+===========================================`;
+
+      // Forçar o download do arquivo de texto
+      const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Fechamento_Caixa_${new Date().toISOString().slice(0,10).replace(/-/g, '')}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
       setCloseCaixaModalOpen(false);
       await loadInitialData();
       setCart([]);
       setCashPaid('');
-      setSuccess(`Caixa fechado com sucesso! Acerto final concluído.`);
+      setSuccess(`Caixa fechado com sucesso! Relatório de segurança baixado.`);
       setTimeout(() => setSuccess(''), 5000);
     } catch (err: any) {
       console.error(err);
