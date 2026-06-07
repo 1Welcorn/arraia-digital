@@ -334,12 +334,9 @@ export function CaixaPDV() {
         parsedContado,
         dif,
         activeSession?.suprimentos || [],
-        vCartao
-      );
-
-      // GERAR RELATÓRIO DE BACKUP DE SEGURANÇA
-      const reportText = `===========================================
-RELATÓRIO DE FECHAMENTO DE CAIXA (BACKUP DE SEGURANÇA)
+      // GERAR RELATORIO DE BACKUP DE SEGURANÇA
+      let reportText = `===========================================
+RELATORIO DE FECHAMENTO DE CAIXA (BACKUP DE SEGURANCA)
 ===========================================
 Operador: ${activeSession?.operadorEmail || 'Desconhecido'}
 Data de Abertura: ${new Date(activeSession?.timestampAbertura || Date.now()).toLocaleString()}
@@ -349,7 +346,7 @@ Data de Fechamento: ${new Date().toLocaleString()}
 Valor de Abertura: R$ ${(activeSession?.valorAbertura || 0).toFixed(2)}
 Vendas em Dinheiro: R$ ${vDinheiro.toFixed(2)}
 Vendas em Pix: R$ ${vPix.toFixed(2)}
-Vendas em Cartão: R$ ${vCartao.toFixed(2)}
+Vendas em Cartao: R$ ${vCartao.toFixed(2)}
 Total de Suprimentos (+): R$ ${tSuprimentos.toFixed(2)}
 Total de Sangrias (-): R$ ${tSangrias.toFixed(2)}
 -------------------------------------------
@@ -357,13 +354,16 @@ Total de Sangrias (-): R$ ${tSangrias.toFixed(2)}
 -------------------------------------------
 2. CONTAGEM REAL (OPERADOR/GERENTE)
 Valor Contado na Gaveta: R$ ${parsedContado.toFixed(2)}
-Divergência (Falta/Sobra): R$ ${dif.toFixed(2)}
+Divergencia (Falta/Sobra): R$ ${dif.toFixed(2)}
 -------------------------------------------
-Observações do Fechamento:
+Observacoes do Fechamento:
 ${msgFechamento}
 ===========================================
-ARQUIVO DE SEGURANÇA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
+ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
 ===========================================`;
+
+      // Remove acentos para evitar quebra de codificação no txt de celulares
+      reportText = reportText.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
       // Forçar o download do arquivo de texto
       const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
@@ -1818,18 +1818,15 @@ ARQUIVO DE SEGURANÇA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
             </div>
 
             <div className="flex flex-col gap-3">
-              <button
-                onClick={() => {
-                  const total = ultimaVendaCart.reduce((acc, item) => acc + (item.product.preco * item.quantity), 0).toFixed(2);
-                  const itemsText = ultimaVendaCart.map(i => `• ${i.quantity}x ${i.product.nome} (R$ ${(i.product.preco * i.quantity).toFixed(2)})`).join('%0A');
-                  const message = `*RECIBO DIGITAL - ARRAIÁ*%0A-----------------------------------%0A*Pagamento:* ${ultimaVendaMethod}%0A*Itens:*%0A${itemsText}%0A-----------------------------------%0A*Total: R$ ${total}*%0A%0A🔥🌽 _Muito obrigado e bom arraiá!_`;
-                  window.open(`https://wa.me/5543999567378?text=${message}`, '_blank');
-                }}
+              <a
+                href={`https://wa.me/5543999567378?text=${encodeURIComponent(`*RECIBO DIGITAL - ARRAIÁ*%0A-----------------------------------%0A*Pagamento:* ${ultimaVendaMethod}%0A*Itens:*%0A${ultimaVendaCart.map(i => `• ${i.quantity}x ${i.product.nome} (R$ ${(i.product.preco * i.quantity).toFixed(2)})`).join('%0A')}%0A-----------------------------------%0A*Total: R$ ${ultimaVendaCart.reduce((acc, item) => acc + (item.product.preco * item.quantity), 0).toFixed(2)}*%0A%0A🔥🌽 _Muito obrigado e bom arraiá!_`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full py-4 rounded-2xl bg-[#25D366] text-white hover:bg-[#1ebd5a] active:scale-95 text-lg font-black transition-all cursor-pointer shadow-lg shadow-green-900/40 flex items-center justify-center gap-2 uppercase tracking-wide"
               >
                 <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-message-circle"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>
                 Enviar via WhatsApp
-              </button>
+              </a>
 
               <button
                 onClick={() => {
@@ -1858,16 +1855,15 @@ ARQUIVO DE SEGURANÇA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
             </div>
 
             <div className="flex flex-col gap-3">
-              <button
-                onClick={() => {
-                  const message = encodeURIComponent(ultimoRelatorioText);
-                  window.open(`https://wa.me/5543999567378?text=${message}`, '_blank');
-                }}
+              <a
+                href={`https://wa.me/5543999567378?text=${encodeURIComponent(ultimoRelatorioText)}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full py-4 rounded-2xl bg-[#25D366] text-white hover:bg-[#1ebd5a] active:scale-95 text-lg font-black transition-all cursor-pointer shadow-lg shadow-green-900/40 flex items-center justify-center gap-2 uppercase tracking-wide"
               >
                 <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-message-circle"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>
                 Enviar Relatório p/ WhatsApp
-              </button>
+              </a>
 
               <button
                 onClick={() => {
