@@ -9,11 +9,29 @@ import path from 'path';
 dotenv.config();
 
 const app = express();
-const prisma = new PrismaClient({ url: process.env.DATABASE_URL });
+let prisma: any;
+let prismaError: string = "";
+try {
+  prisma = new PrismaClient({ url: process.env.DATABASE_URL });
+} catch (e: any) {
+  prismaError = e.message || String(e);
+}
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    hasPrisma: !!prisma, 
+    prismaError,
+    dbUrl: process.env.DATABASE_URL ? "SET" : "MISSING", 
+    directUrl: process.env.DIRECT_URL ? "SET" : "MISSING",
+    cwd: process.cwd(),
+    dirname: __dirname
+  });
+});
 
 const JWT_SECRET = process.env.JWT_SECRET || 'arraia-secreto-super-seguro';
 
