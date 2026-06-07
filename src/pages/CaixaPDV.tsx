@@ -21,7 +21,9 @@ import {
   BellRing,
   BellOff,
   MessageSquare,
-  X
+  X,
+  ChevronDown,
+  Lock
 } from 'lucide-react';
 import { authLocalService } from '../services/authLocalService';
 import type { UserSession } from '../services/authLocalService';
@@ -115,6 +117,7 @@ export function CaixaPDV() {
 
   // Mobile Layout
   const [isCartOpenMobile, setIsCartOpenMobile] = useState(false);
+  const [isTopAdminMenuOpen, setIsTopAdminMenuOpen] = useState(false);
 
   useEffect(() => {
     // Carrega usuário
@@ -782,17 +785,59 @@ export function CaixaPDV() {
                   ))}
                 </div>
 
-                <div className="flex items-center gap-2 border-l border-slate-850 pl-4">
-                  <Filter size={12} className="text-slate-500" />
-                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Ordenar por:</span>
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as any)}
-                    className="rounded-lg border border-slate-800 bg-slate-950 px-2.5 py-1 text-xs font-bold text-slate-300 focus:outline-none focus:border-amber-400"
+                {/* MENU ADMINISTRATIVO DO CAIXA (Substitui o Ordenar Por) */}
+                <div className="relative z-30 flex items-center border-l border-slate-850 pl-4">
+                  <button
+                    onClick={() => setIsTopAdminMenuOpen(!isTopAdminMenuOpen)}
+                    className="flex items-center gap-2 bg-slate-900 border border-slate-800 text-slate-300 px-3 py-2 rounded-xl text-xs font-bold hover:bg-slate-800 hover:text-white transition-colors cursor-pointer"
                   >
-                    <option value="cor_nome">🎨 Cor da Ficha + Nome</option>
-                    <option value="nome">🔠 Nome (A-Z)</option>
-                  </select>
+                    <Settings size={14} />
+                    <span className="hidden sm:inline">Gerenciamento do Caixa</span>
+                    <span className="sm:hidden">Caixa</span>
+                    <ChevronDown size={14} className={`transition-transform ${isTopAdminMenuOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {isTopAdminMenuOpen && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setIsTopAdminMenuOpen(false)}></div>
+                      <div className="absolute right-0 top-full mt-2 w-56 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl z-50 overflow-hidden animate-fade-in flex flex-col p-1">
+                        <button
+                          onClick={() => {
+                            setIsTopAdminMenuOpen(false);
+                            setError('');
+                            setSuprimentoValue('');
+                            setSuprimentoReason('');
+                            setSuprimentoModalOpen(true);
+                          }}
+                          className="flex items-center gap-2 text-left w-full px-3 py-2.5 text-xs font-bold text-emerald-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+                        >
+                          <Plus size={14} /> Suprimento de Caixa
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsTopAdminMenuOpen(false);
+                            setError('');
+                            setSangriaValue('');
+                            setSangriaReason('');
+                            setSangriaModalOpen(true);
+                          }}
+                          className="flex items-center gap-2 text-left w-full px-3 py-2.5 text-xs font-bold text-rose-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+                        >
+                          <Minus size={14} /> Realizar Sangria
+                        </button>
+                        <div className="h-px bg-slate-800 my-1"></div>
+                        <button
+                          onClick={() => {
+                            setIsTopAdminMenuOpen(false);
+                            handleOpenFecharCaixaModal();
+                          }}
+                          className="flex items-center gap-2 text-left w-full px-3 py-2.5 text-xs font-bold text-slate-300 hover:bg-rose-950 hover:text-rose-400 rounded-lg transition-colors cursor-pointer"
+                        >
+                          <Lock size={14} /> Abrir / Fechar Caixa
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -996,44 +1041,12 @@ export function CaixaPDV() {
                   </button>
                 </div>
 
-                {/* SANGRIAS / SUPRIMENTOS / FECHAR CAIXA */}
-                <div className="pt-2.5 border-t border-slate-800 space-y-2">
+                {/* INFORMAÇÕES DA SESSÃO */}
+                <div className="pt-2.5 border-t border-slate-800">
                   <div className="flex justify-between items-center text-xs">
                     <span className="text-slate-400">Abertura: {new Date(activeSession.timestampAbertura).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                     <span className="text-[10px] text-slate-500 font-semibold">Caixa: {activeSession.operadorEmail.split('@')[0]}</span>
                   </div>
-                  
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      onClick={() => {
-                        setError('');
-                        setSuprimentoValue('');
-                        setSuprimentoReason('');
-                        setSuprimentoModalOpen(true);
-                      }}
-                      className="py-1 rounded bg-slate-900 border border-slate-800 hover:bg-slate-800 font-bold text-emerald-400 text-[10px] transition-colors cursor-pointer flex items-center justify-center gap-1"
-                    >
-                      📥 Suprimento
-                    </button>
-                    <button
-                      onClick={() => {
-                        setError('');
-                        setSangriaValue('');
-                        setSangriaReason('');
-                        setSangriaModalOpen(true);
-                      }}
-                      className="py-1 rounded bg-slate-900 border border-slate-800 hover:bg-slate-800 font-bold text-rose-400 text-[10px] transition-colors cursor-pointer flex items-center justify-center gap-1"
-                    >
-                      💸 Sangria
-                    </button>
-                  </div>
-
-                  <button
-                    onClick={handleOpenFecharCaixaModal}
-                    className="w-full py-1.5 rounded bg-rose-950/35 border border-rose-900/30 font-bold text-rose-300 text-xs hover:bg-rose-900/30 transition-colors cursor-pointer text-center"
-                  >
-                    Fechar Caixa (Acerto Final)
-                  </button>
                 </div>
 
               </div>
