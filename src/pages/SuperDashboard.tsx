@@ -15,6 +15,7 @@ import { authLocalService } from '../services/authLocalService';
 import type { UserSession } from '../services/authLocalService';
 import { userRepository, sha256 } from '../repository/userRepository';
 import { db } from '../database/DatabaseConnection';
+import { apiClient } from '../services/apiClient';
 import type { UsuarioSistema } from '../database/DatabaseConnection';
 import { syncEngine } from '../services/syncEngine';
 
