@@ -2,8 +2,9 @@ import express from 'express';
 import cors from 'cors';
 // @ts-ignore
 import pg from 'pg';
-import { PrismaClient } from './generated/client';
 import dotenv from 'dotenv';
+// @ts-ignore
+const { PrismaClient } = require('./generated/client');
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
 import path from 'path';
