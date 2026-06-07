@@ -220,6 +220,30 @@ app.get('/api/sync/messages', authenticateToken, async (req: any, res) => {
   }
 });
 
+// Puxar sessões de caixa (para o Admin)
+app.get('/api/sync/sessions', authenticateToken, async (req, res) => {
+  try {
+    const sessions = await prisma.caixaSession.findMany();
+    res.json(sessions);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar sessões de caixa' });
+  }
+});
+
+// Puxar vendas (para o Admin)
+app.get('/api/sync/sales', authenticateToken, async (req, res) => {
+  try {
+    const sales = await prisma.sale.findMany({
+      include: {
+        items: true
+      }
+    });
+    res.json(sales);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar vendas' });
+  }
+});
+
 // ==========================================
 // ROTAS DE SINCRONIZAÇÃO (PUSH)
 // ==========================================

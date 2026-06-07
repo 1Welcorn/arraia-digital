@@ -157,7 +157,14 @@ export function AdminDashboard() {
       const active = await saleRepository.getActiveCaixaSession();
       setActiveSession(active);
 
-      const past = await saleRepository.getAllPastCaixaSessions();
+      // Puxa do banco local Dexie que agora é populado com as sessões da Nuvem
+      const allSessions = await db.sessoes_caixa.toArray();
+      // Filtra para remover a sessão ativa atual deste próprio dispositivo, pois ela já é mostrada na parte de cima
+      const past = allSessions.filter(s => active ? s.id !== active.id : true);
+      
+      // Ordena por data decrescente (mais recente primeiro)
+      past.sort((a, b) => b.timestampAbertura - a.timestampAbertura);
+      
       setCaixaSessions(past);
     } catch (err) {
       console.error('Erro ao carregar dados do admin:', err);
@@ -535,8 +542,8 @@ export function AdminDashboard() {
                             <span className="block text-[9px] text-amber-500 font-semibold italic">Aguardando contagem...</span>
                           </td>
                           <td className="px-6 py-4">
-                            <span className="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                              ABERTO / EM OPERAÇÃO
+                            <span className="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 block w-fit mb-1.5">
+                              ABERTO / NESTE TABLET
                             </span>
                           </td>
                         </tr>
@@ -600,8 +607,8 @@ export function AdminDashboard() {
                               )}
                             </td>
                             <td className="px-6 py-4 max-w-xs">
-                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-400 block w-fit mb-1.5">
-                                FECHADO
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-bold block w-fit mb-1.5 ${session.status === 'aberto' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 animate-pulse' : 'bg-slate-800 text-slate-400'}`}>
+                                {session.status === 'aberto' ? 'ABERTO EM OUTRO CAIXA' : 'FECHADO'}
                               </span>
                               <span className="text-[10px] text-slate-400 leading-snug block italic line-clamp-2" title={session.observacoes}>
                                 {session.observacoes}

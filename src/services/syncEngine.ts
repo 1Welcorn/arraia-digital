@@ -164,6 +164,69 @@ class SyncEngineManager {
         console.warn('[Sync] Falha ao buscar novas mensagens');
       }
 
+      // Se for ADMIN ou SUPER_ADMIN, vamos puxar todas as vendas e sessões também
+      const currentUser = authLocalService.getCurrentUser();
+      if (currentUser && (currentUser.role === 'ADMIN_OPERACIONAL' || currentUser.role === 'SUPER_ADMIN')) {
+        // PULL DE SESSÕES DE CAIXA
+        try {
+          const sessRes = await apiClient.get('/sync/sessions?t=' + Date.now());
+          if (sessRes.data && Array.isArray(sessRes.data)) {
+            const mappedSessions = sessRes.data.map((s: any) => ({
+              id: s.id,
+              operadorEmail: s.operadorEmail,
+              status: s.status,
+              valorAbertura: s.valorAbertura,
+              valorFechamento: s.valorFechamento,
+              timestampAbertura: s.timestampAbertura,
+              timestampFechamento: s.timestampFechamento,
+              observacoes: s.observacoes,
+              sangrias: JSON.parse(s.sangriasJson || '[]'),
+              suprimentos: JSON.parse(s.suprimentosJson || '[]'),
+            }));
+            await db.sessoes_caixa.bulkPut(mappedSessions);
+          }
+        } catch (err) {
+          console.warn('[Sync] Falha ao buscar sessões de caixa', err);
+        }
+
+        // PULL DE VENDAS
+        try {
+          const salesRes = await apiClient.get('/sync/sales?t=' + Date.now());
+          if (salesRes.data && Array.isArray(salesRes.data)) {
+            const vendas = [];
+            const itens = [];
+            for (const s of salesRes.data) {
+              vendas.push({
+                id: s.id,
+                device_id: s.device_id,
+                valor_total: s.valor_total,
+                metodo_pagamento: s.metodo_pagamento,
+                codigo_pix_utilizado: s.codigo_pix,
+                valor_pago: s.valor_pago,
+                troco: s.troco,
+                criado_em: s.criado_em,
+                status_sync: 'synced'
+              });
+              if (s.items && Array.isArray(s.items)) {
+                for (const it of s.items) {
+                  itens.push({
+                    id: it.id,
+                    venda_id: it.venda_id,
+                    produto_id: it.produto_id,
+                    quantidade: it.quantidade,
+                    preco_unitario: it.preco_unitario
+                  });
+                }
+              }
+            }
+            await db.vendas.bulkPut(vendas as any);
+            await db.itens_venda.bulkPut(itens as any);
+          }
+        } catch (err) {
+          console.warn('[Sync] Falha ao buscar vendas', err);
+        }
+      }
+
       // 5. PULL DE USUÁRIOS
       await this.syncUsersOnly();
 
