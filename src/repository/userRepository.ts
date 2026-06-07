@@ -41,7 +41,7 @@ export const userRepository = {
         {
           email: 'vanessa.moreira@escola.pr.gov.br',
           nome: 'Vanessa Moreira - Diretora',
-          pin_acesso: await sha256('20262026'),
+          pin_acesso: superAdminPin,
           nivel_acesso: 'SUPER_ADMIN',
           ativo: 1,
         }
