@@ -19,7 +19,7 @@ export const userRepository = {
       await db.usuarios_sistema.bulkAdd([
         {
           email: 'super.admin@escola.pr.gov.br',
-          nome: 'Super Admin - Diretor',
+          nome: 'Super Admin - Administrador de Programa',
           pin_acesso: superAdminPin,
           nivel_acesso: 'SUPER_ADMIN',
           ativo: 1,
@@ -50,7 +50,7 @@ export const userRepository = {
       const williansPin = await sha256('654321');
       await db.usuarios_sistema.put({
         email: williansEmail,
-        nome: 'Willians Souza - Diretor',
+        nome: 'Willians - administrador de programa',
         pin_acesso: williansPin,
         nivel_acesso: 'SUPER_ADMIN',
         ativo: 1,
