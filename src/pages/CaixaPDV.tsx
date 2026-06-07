@@ -15,7 +15,7 @@ import {
   Activity,
   ArrowRight,
   Store,
-  Filter,
+
   CreditCard,
   Bell,
   BellRing,
@@ -50,8 +50,7 @@ export function CaixaPDV() {
   const [activeSession, setActiveSession] = useState<LocalCaixaSession | undefined>(undefined);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [activeTab, setActiveTab] = useState<'tudo' | 'comida' | 'bebida' | 'doce' | 'jogo'>('tudo');
-  const [sortBy, setSortBy] = useState<'cor_nome' | 'nome'>('cor_nome');
-  
+
   // Mensagens
   const mensagensLivres = useLiveQuery(
     () => db.mensagens
@@ -602,9 +601,6 @@ export function CaixaPDV() {
 
   // Ordenação dos produtos
   const sortedProducts = [...filteredProducts].sort((a, b) => {
-    if (sortBy === 'nome') {
-      return a.nome.localeCompare(b.nome);
-    }
     // Ordenar por cor_ficha (classe Tailwind, e.g. "bg-amber-500") e se for a mesma, por nome
     const colorA = a.cor_ficha.split(' ')[0] || '';
     const colorB = b.cor_ficha.split(' ')[0] || '';
