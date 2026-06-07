@@ -223,6 +223,21 @@ app.post('/api/sync/users', authenticateToken, async (req, res) => {
   }
 });
 
+// Apagar usuário da Nuvem
+app.delete('/api/sync/users/:email', authenticateToken, async (req: any, res) => {
+  try {
+    const { email } = req.params;
+    const client = new Client({ connectionString: getDbUrl() });
+    await client.connect();
+    await client.query(`DELETE FROM "User" WHERE email = $1`, [email.toLowerCase()]);
+    await client.end();
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Erro ao deletar usuário:', error);
+    res.status(500).json({ error: 'Erro interno ao deletar usuário' });
+  }
+});
+
 // Sincronizar produtos (Admin -> Nuvem)
 app.post('/api/sync/products', authenticateToken, async (req, res) => {
   try {

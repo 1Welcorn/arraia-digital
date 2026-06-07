@@ -117,11 +117,19 @@ export function SuperDashboard() {
     if (!window.confirm(`Tem certeza que deseja remover ${email} da Whitelist?`)) return;
 
     try {
+      // 1. Apaga na nuvem primeiro
+      try {
+        await apiClient.delete(`/sync/users/${email}`);
+      } catch (cloudErr) {
+        console.warn('Erro ao apagar na nuvem, ou usuário já não existia lá:', cloudErr);
+      }
+
+      // 2. Apaga localmente
       await userRepository.deleteUser(email);
-      setSuccess('Usuário removido da Whitelist.');
+      setSuccess('Usuário removido da Whitelist e da Nuvem.');
       await loadUsers();
       
-      // Tenta sincronizar (Nota: a API atual de push upsert não deleta na nuvem, seria necessária uma rota DELETE, mas garantimos o PUSH)
+      // Tenta sincronizar o restante
       syncEngine.syncNow().catch(() => {});
 
       setTimeout(() => setSuccess(''), 4000);
