@@ -1819,7 +1819,7 @@ ARQUIVO DE SEGURANÇA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
                   const total = ultimaVendaCart.reduce((acc, item) => acc + (item.product.preco * item.quantity), 0).toFixed(2);
                   const itemsText = ultimaVendaCart.map(i => `• ${i.quantity}x ${i.product.nome} (R$ ${(i.product.preco * i.quantity).toFixed(2)})`).join('%0A');
                   const message = `*RECIBO DIGITAL - ARRAIÁ*%0A-----------------------------------%0A*Pagamento:* ${ultimaVendaMethod}%0A*Itens:*%0A${itemsText}%0A-----------------------------------%0A*Total: R$ ${total}*%0A%0A🔥🌽 _Muito obrigado e bom arraiá!_`;
-                  window.open(`https://wa.me/?text=${message}`, '_blank');
+                  window.open(`https://wa.me/5543999567378?text=${message}`, '_blank');
                 }}
                 className="w-full py-4 rounded-2xl bg-[#25D366] text-white hover:bg-[#1ebd5a] active:scale-95 text-lg font-black transition-all cursor-pointer shadow-lg shadow-green-900/40 flex items-center justify-center gap-2 uppercase tracking-wide"
               >
