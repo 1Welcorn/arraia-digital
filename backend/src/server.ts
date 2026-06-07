@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+// @ts-ignore
 import pg from 'pg';
 import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
@@ -23,10 +24,15 @@ try {
 app.use(cors());
 app.use(express.json());
 
+const getDbUrl = () => {
+  let url = process.env.DATABASE_URL || '';
+  return url.replace(/^['"]+/, '').replace(/['"]+$/, '').trim();
+};
+
 app.get('/api/health', async (req, res) => {
   let dbStatus = "Unknown";
   try {
-    const client = new Client({ connectionString: process.env.DATABASE_URL });
+    const client = new Client({ connectionString: getDbUrl() });
     await client.connect();
     await client.end();
     dbStatus = "Connected OK";
@@ -50,7 +56,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'arraia-secreto-super-seguro';
 // ROTA DE AUTENTICAÇÃO
 // ==========================================
 app.post('/api/auth/login', async (req, res) => {
-  const client = new Client({ connectionString: process.env.DATABASE_URL });
+  const client = new Client({ connectionString: getDbUrl() });
   try {
     const { email, pin_acesso } = req.body;
 
@@ -138,11 +144,16 @@ const authenticateToken = (req: any, res: any, next: any) => {
 
 // Puxar lista de usuários (Whitelist) - Rota ABERTA para novos tablets
 app.get('/api/sync/users', async (req, res) => {
+  const client = new Client({ connectionString: getDbUrl() });
   try {
-    const users = await prisma.user.findMany();
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar usuários' });
+    await client.connect();
+    const result = await client.query('SELECT * FROM "User"');
+    res.json(result.rows);
+  } catch (error: any) {
+    console.error("Erro no sync users:", error);
+    res.status(500).json({ error: 'Erro ao buscar usuários', details: error.message || String(error) });
+  } finally {
+    try { await client.end(); } catch(e) {}
   }
 });
 
