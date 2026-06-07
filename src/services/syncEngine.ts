@@ -108,7 +108,13 @@ class SyncEngineManager {
       const pendingSales = await saleRepository.getPendingSyncSales();
       if (pendingSales.length > 0) {
         console.log(`[Sync] Enviando ${pendingSales.length} venda(s) para a nuvem...`);
-        const res = await apiClient.post('/sync/sales', pendingSales);
+        // Precisamos anexar os itens em cada venda antes de enviar
+        const salesWithItems = await Promise.all(pendingSales.map(async (sale) => {
+          const items = await saleRepository.getSaleItems(sale.id);
+          return { ...sale, itens: items };
+        }));
+
+        const res = await apiClient.post('/sync/sales', salesWithItems);
         if (res.data?.success) {
           // Marca todas como sincronizadas no banco local
           for (const sale of pendingSales) {
@@ -121,9 +127,15 @@ class SyncEngineManager {
       // 2. PUSH DE SESSÕES DE CAIXA
       // Envia todo o histórico local para a nuvem. O Backend usa UPSERT (Idempotência)
       const allSessions = await saleRepository.getAllPastCaixaSessions();
-      if (allSessions.length > 0) {
-        console.log(`[Sync] Sincronizando ${allSessions.length} sessões de caixa...`);
-        await apiClient.post('/sync/sessions', allSessions);
+      const activeSession = await saleRepository.getActiveCaixaSession();
+      const sessionsToSync = [...allSessions];
+      if (activeSession) {
+        sessionsToSync.push(activeSession);
+      }
+
+      if (sessionsToSync.length > 0) {
+        console.log(`[Sync] Sincronizando ${sessionsToSync.length} sessões de caixa...`);
+        await apiClient.post('/sync/sessions', sessionsToSync);
       }
 
       // 2.1 PUSH DE USUÁRIOS (Whitelist)
