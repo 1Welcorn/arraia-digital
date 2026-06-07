@@ -412,10 +412,10 @@ app.post('/api/reset-test-data', authenticateToken, async (req: any, res) => {
   }
   try {
     // Apaga os dados transacionais e mantém os cadastrais (Usuários e Produtos)
-    await prisma.saleItem.deleteMany();
-    await prisma.sale.deleteMany();
-    await prisma.caixaSession.deleteMany();
-    await prisma.message.deleteMany();
+    await prisma.$executeRaw`DELETE FROM "SaleItem"`;
+    await prisma.$executeRaw`DELETE FROM "Sale"`;
+    await prisma.$executeRaw`DELETE FROM "CaixaSession"`;
+    await prisma.$executeRaw`DELETE FROM "Message"`;
     res.json({ success: true, message: 'Dados de teste apagados com sucesso!' });
   } catch (err) {
     console.error('Erro ao resetar testes:', err);
