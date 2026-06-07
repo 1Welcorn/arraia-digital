@@ -741,12 +741,12 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
                 onClick={() => setMensagensModalOpen(true)}
                 className={`p-1.5 md:p-2 rounded-xl border transition-colors cursor-pointer ${
                   mensagensNaoLidas.length > 0
-                    ? 'bg-rose-500/10 border-rose-500/40 text-rose-500 hover:bg-rose-500/20'
+                    ? 'bg-rose-500/20 border-rose-500/40 text-rose-500 hover:bg-rose-500/30 animate-pulse shadow-[0_0_15px_rgba(244,63,94,0.3)]'
                     : 'bg-slate-800/50 border-slate-700/50 text-slate-400 hover:bg-slate-800 hover:text-slate-300'
                 }`}
               >
                 {mensagensNaoLidas.length > 0 ? (
-                  <BellRing size={16} className="md:w-5 md:h-5 animate-pulse" />
+                  <BellRing size={16} className="md:w-5 md:h-5" />
                 ) : (
                   <Bell size={16} className="md:w-5 md:h-5" />
                 )}
