@@ -969,13 +969,13 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
                       key={product.id}
                       onClick={() => handleAddToCart(product)}
                       disabled={product.ativo === 0}
-                      className={`group relative overflow-hidden flex items-center justify-between p-3 h-auto min-h-[90px] rounded-2xl border text-left transition-all duration-200 active:scale-[0.98] shadow-md ${
+                      className={`group relative overflow-hidden flex items-stretch justify-between p-3 h-auto min-h-[105px] rounded-2xl border text-left transition-all duration-200 active:scale-[0.98] shadow-md ${
                         product.ativo === 0
                           ? 'opacity-40 bg-slate-950 border-slate-900 cursor-not-allowed'
                           : `${product.cor_ficha} cursor-pointer hover:-translate-y-0.5 hover:shadow-lg`
                       }`}
                     >
-                      <div className="flex-1 flex flex-col justify-center h-full pr-4 min-w-0">
+                      <div className="flex-1 flex flex-col justify-between pr-4 min-w-0 py-0.5">
                         <div className="flex flex-col mb-1.5">
                           <span className="font-black text-base sm:text-lg leading-tight line-clamp-2 text-white drop-shadow-sm">
                             {product.nome}
