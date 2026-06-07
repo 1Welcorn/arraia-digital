@@ -1823,8 +1823,6 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
             <div className="flex flex-col gap-3">
               <a
                 href={`https://wa.me/5543999567378?text=${encodeURIComponent(`*RECIBO DIGITAL - ARRAIÁ*%0A-----------------------------------%0A*Pagamento:* ${ultimaVendaMethod}%0A*Itens:*%0A${ultimaVendaCart.map(i => `• ${i.quantity}x ${i.product.nome} (R$ ${(i.product.preco * i.quantity).toFixed(2)})`).join('%0A')}%0A-----------------------------------%0A*Total: R$ ${ultimaVendaCart.reduce((acc, item) => acc + (item.product.preco * item.quantity), 0).toFixed(2)}*%0A%0A🔥🌽 _Muito obrigado e bom arraiá!_`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="w-full py-4 rounded-2xl bg-[#25D366] text-white hover:bg-[#1ebd5a] active:scale-95 text-lg font-black transition-all cursor-pointer shadow-lg shadow-green-900/40 flex items-center justify-center gap-2 uppercase tracking-wide"
               >
                 <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-message-circle"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>
@@ -1860,8 +1858,6 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
             <div className="flex flex-col gap-3">
               <a
                 href={`https://wa.me/5543999567378?text=${encodeURIComponent(ultimoRelatorioText)}`}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="w-full py-4 rounded-2xl bg-[#25D366] text-white hover:bg-[#1ebd5a] active:scale-95 text-lg font-black transition-all cursor-pointer shadow-lg shadow-green-900/40 flex items-center justify-center gap-2 uppercase tracking-wide"
               >
                 <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-message-circle"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>
