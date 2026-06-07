@@ -571,16 +571,17 @@ export function AdminDashboard() {
                       {caixaSessions.map((session, index) => {
                         const totalS = (session.sangrias || []).reduce((acc, s) => acc + s.valor, 0);
                         const totalSup = (session.suprimentos || []).reduce((acc, s) => acc + s.valor, 0);
-                        let vDin = session.vendasDinheiro || 0;
-                        let vPix = session.vendasPix || 0;
-                        let vCar = session.vendasCartao || 0;
+                        const isForSession = (s: Venda) => {
+                          const time = new Date(s.criado_em).getTime();
+                          const afterOpen = time >= session.timestampAbertura;
+                          const beforeClose = !session.timestampFechamento || time <= session.timestampFechamento;
+                          const isSameOperator = s.device_id === session.operadorEmail || s.device_id === 'device-local-tablet';
+                          return afterOpen && beforeClose && isSameOperator;
+                        };
 
-                        // Se o caixa está aberto, precisamos calcular as vendas ao vivo varrendo as notas fiscais
-                        if (session.status === 'aberto') {
-                          vDin = sales.filter(s => s.device_id === session.operadorEmail && new Date(s.criado_em).getTime() >= session.timestampAbertura && s.metodo_pagamento === 'DINHEIRO').reduce((acc, s) => acc + s.valor_total, 0);
-                          vPix = sales.filter(s => s.device_id === session.operadorEmail && new Date(s.criado_em).getTime() >= session.timestampAbertura && s.metodo_pagamento === 'PIX_LOCAL').reduce((acc, s) => acc + s.valor_total, 0);
-                          vCar = sales.filter(s => s.device_id === session.operadorEmail && new Date(s.criado_em).getTime() >= session.timestampAbertura && s.metodo_pagamento === 'CARTAO').reduce((acc, s) => acc + s.valor_total, 0);
-                        }
+                        const vDin = sales.filter(s => isForSession(s) && s.metodo_pagamento === 'DINHEIRO').reduce((acc, s) => acc + s.valor_total, 0);
+                        const vPix = sales.filter(s => isForSession(s) && s.metodo_pagamento === 'PIX_LOCAL').reduce((acc, s) => acc + s.valor_total, 0);
+                        const vCar = sales.filter(s => isForSession(s) && s.metodo_pagamento === 'CARTAO').reduce((acc, s) => acc + s.valor_total, 0);
 
                         const est = session.valorAbertura + vDin + totalSup - totalS;
                         return (
