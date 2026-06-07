@@ -37,6 +37,13 @@ export const userRepository = {
           pin_acesso: operadorPin,
           nivel_acesso: 'OPERADOR_CAIXA',
           ativo: 1,
+        },
+        {
+          email: 'vanessa.moreira@escola.pr.gov.br',
+          nome: 'Vanessa Moreira - Diretora',
+          pin_acesso: await sha256('20262026'),
+          nivel_acesso: 'SUPER_ADMIN',
+          ativo: 1,
         }
       ]);
 
