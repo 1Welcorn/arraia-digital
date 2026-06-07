@@ -12,8 +12,13 @@ const app = express();
 let prisma: any;
 let prismaError: string = "";
 try {
-  // O Prisma automaticamente lê a variável DATABASE_URL do ambiente
-  prisma = new PrismaClient();
+  prisma = new PrismaClient({
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL,
+      },
+    },
+  });
 } catch (e: any) {
   prismaError = e.message || String(e);
 }
