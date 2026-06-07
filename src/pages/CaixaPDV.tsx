@@ -977,7 +977,7 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
                           if (product.ativo !== 0) handleAddToCart(product);
                         }
                       }}
-                      className={`group relative grid grid-cols-[1fr_auto] gap-3 p-3 min-h-[110px] rounded-2xl border text-left transition-all duration-200 active:scale-[0.98] shadow-md select-none ${
+                      className={`group relative grid grid-cols-[1fr_auto] gap-3 p-3 min-h-[110px] rounded-2xl border text-left active:scale-[0.98] shadow-md select-none ${
                         product.ativo === 0
                           ? 'opacity-40 bg-slate-950 border-slate-900 cursor-not-allowed'
                           : `${product.cor_ficha} cursor-pointer hover:-translate-y-0.5 hover:shadow-lg`
@@ -993,7 +993,7 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
                           </span>
                         </div>
 
-                        <div className="flex flex-col w-full gap-2 mt-auto">
+                        <div className="flex flex-col w-full gap-2 pt-1">
                           <span className="text-lg sm:text-xl font-black tracking-tight text-white drop-shadow">
                             R$ {product.preco.toFixed(2)}
                           </span>
