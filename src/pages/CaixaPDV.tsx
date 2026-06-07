@@ -977,45 +977,44 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
                           if (product.ativo !== 0) handleAddToCart(product);
                         }
                       }}
-                      className={`group relative grid grid-cols-[1fr_auto] gap-3 p-3 min-h-[110px] rounded-2xl border text-left active:scale-[0.98] shadow-md select-none ${
+                      className={`group relative flex items-start gap-3 p-3 rounded-2xl border text-left active:scale-[0.98] shadow-md select-none transition-transform duration-100 ${
                         product.ativo === 0
                           ? 'opacity-40 bg-slate-950 border-slate-900 cursor-not-allowed'
                           : `${product.cor_ficha} cursor-pointer hover:-translate-y-0.5 hover:shadow-lg`
                       }`}
                     >
-                      <div className="flex flex-col min-w-0">
-                        <div className="flex flex-col mb-3">
-                          <span className="font-black text-base sm:text-lg leading-tight line-clamp-2 text-white drop-shadow-sm">
+                      {/* Lado Esquerdo: Textos e Botões (Bloco Simples) */}
+                      <div className="flex-1 min-w-0">
+                        <div className="mb-2">
+                          <span className="block font-black text-base sm:text-lg leading-tight line-clamp-2 text-white drop-shadow-sm">
                             {product.nome}
                           </span>
-                          <span className="text-xs opacity-80 font-black uppercase mt-1 tracking-wider">
+                          <span className="block text-xs opacity-80 font-black uppercase mt-1 tracking-wider">
                             {product.categoria}
                           </span>
                         </div>
 
-                        <div className="flex flex-col w-full gap-2 pt-1">
-                          <span className="text-lg sm:text-xl font-black tracking-tight text-white drop-shadow">
-                            R$ {product.preco.toFixed(2)}
-                          </span>
-                          
-                          {/* Controles de Quantidade Kiosk */}
-                          {inCartQty > 0 && (
-                            <div className="flex items-center justify-between bg-black/40 rounded-lg p-1.5 w-full z-20 animate-fade-in" onClick={(e) => e.stopPropagation()}>
-                              <button type="button" onClick={() => handleDecrementCart(product.id)} className="w-8 h-8 flex items-center justify-center text-white bg-white/10 rounded-md active:bg-white/30 hover:bg-white/20 cursor-pointer transition-colors">
-                                <Minus size={18} />
-                              </button>
-                              <span className="font-black text-white text-base">{inCartQty}x</span>
-                              <button type="button" onClick={() => handleIncrementCart(product.id)} className="w-8 h-8 flex items-center justify-center text-white bg-white/10 rounded-md active:bg-white/30 hover:bg-white/20 cursor-pointer transition-colors">
-                                <Plus size={18} />
-                              </button>
-                            </div>
-                          )}
+                        <div className="font-black text-lg sm:text-xl tracking-tight text-white drop-shadow mb-2">
+                          R$ {product.preco.toFixed(2)}
                         </div>
+                        
+                        {/* Controles de Quantidade Kiosk */}
+                        {inCartQty > 0 && (
+                          <div className="flex items-center justify-between bg-black/40 rounded-lg p-1.5 w-full z-20" onClick={(e) => e.stopPropagation()}>
+                            <button type="button" onClick={() => handleDecrementCart(product.id)} className="w-8 h-8 flex items-center justify-center text-white bg-white/10 rounded-md active:bg-white/30 hover:bg-white/20 cursor-pointer">
+                              <Minus size={18} />
+                            </button>
+                            <span className="font-black text-white text-base">{inCartQty}x</span>
+                            <button type="button" onClick={() => handleIncrementCart(product.id)} className="w-8 h-8 flex items-center justify-center text-white bg-white/10 rounded-md active:bg-white/30 hover:bg-white/20 cursor-pointer">
+                              <Plus size={18} />
+                            </button>
+                          </div>
+                        )}
                       </div>
 
-                      {/* Imagem Ilustrativa da Categoria */}
+                      {/* Lado Direito: Imagem */}
                       {product.imagem && (
-                        <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-xl overflow-hidden border border-black/15 bg-slate-900/10 flex items-center justify-center shadow-inner transition-transform duration-300 group-hover:scale-105 self-start ${inCartQty > 0 ? 'opacity-30 md:opacity-100' : ''}`}>
+                        <div className={`w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-xl overflow-hidden border border-black/15 bg-slate-900/10 flex items-center justify-center shadow-inner ${inCartQty > 0 ? 'opacity-30 md:opacity-100' : ''}`}>
                           <img src={product.imagem} alt={product.nome} className="w-full h-full object-cover" />
                         </div>
                       )}
