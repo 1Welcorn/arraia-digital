@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 // @ts-ignore
 import pg from 'pg';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from './generated/client';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
