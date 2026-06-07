@@ -652,7 +652,7 @@ export function CaixaPDV() {
     <div className="flex flex-col h-full w-full bg-slate-900 text-white select-none">
       
       {/* HEADER DO OPERADOR */}
-      <header className="flex items-center justify-between border-b border-slate-800 bg-slate-950 px-3 md:px-6 py-3 md:py-4 shadow-md gap-2">
+      <header className="flex items-center justify-between border-b border-slate-800 bg-slate-950 px-3 md:px-6 pt-10 pb-3 md:py-4 shadow-md gap-2">
         <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
           <span className="text-2xl md:text-3xl">🔥</span>
           <div className="hidden sm:block">
@@ -1114,7 +1114,7 @@ export function CaixaPDV() {
             </div>
 
             {/* KIOSK MODE: BARRA FLUTUANTE DE PAGAMENTO (APENAS MOBILE) */}
-            {!isCartOpenMobile && cart.length > 0 && (
+            {!isCartOpenMobile && (
               <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-md border-t border-slate-800 p-4 pb-6 flex flex-col gap-3 z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
                 
                 <div className="flex items-center justify-between mb-1">
@@ -1126,13 +1126,28 @@ export function CaixaPDV() {
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">
-                  <button onClick={handleFinalizarDinheiro} className="bg-emerald-600 text-white p-3 rounded-xl text-xs font-bold flex flex-col items-center gap-1 active:scale-[0.98] shadow-lg">
+                  <button 
+                    onClick={handleFinalizarDinheiro} 
+                    disabled={cart.length === 0}
+                    className={`p-3 rounded-xl text-xs font-bold flex flex-col items-center gap-1 active:scale-[0.98] shadow-lg transition-colors ${
+                      cart.length > 0 ? 'bg-emerald-600 text-white hover:bg-emerald-500' : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
+                    }`}>
                     <DollarSign size={20} /> Dinheiro
                   </button>
-                  <button onClick={handleGerarPix} className="bg-amber-500 text-slate-950 p-3 rounded-xl text-xs font-bold flex flex-col items-center gap-1 active:scale-[0.98] shadow-lg">
+                  <button 
+                    onClick={handleGerarPix} 
+                    disabled={cart.length === 0}
+                    className={`p-3 rounded-xl text-xs font-bold flex flex-col items-center gap-1 active:scale-[0.98] shadow-lg transition-colors ${
+                      cart.length > 0 ? 'bg-amber-500 text-slate-950 hover:bg-amber-400' : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
+                    }`}>
                     <QrCode size={20} /> Pix
                   </button>
-                  <button onClick={handleFinalizarCartao} className="bg-purple-600 text-white p-3 rounded-xl text-xs font-bold flex flex-col items-center gap-1 active:scale-[0.98] shadow-lg">
+                  <button 
+                    onClick={handleFinalizarCartao} 
+                    disabled={cart.length === 0}
+                    className={`p-3 rounded-xl text-xs font-bold flex flex-col items-center gap-1 active:scale-[0.98] shadow-lg transition-colors ${
+                      cart.length > 0 ? 'bg-purple-600 text-white hover:bg-purple-500' : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
+                    }`}>
                     <CreditCard size={20} /> Cartão
                   </button>
                 </div>
