@@ -196,14 +196,19 @@ app.post('/api/sync/users', authenticateToken, async (req, res) => {
   try {
     const users = req.body;
     if (!Array.isArray(users)) return res.status(400).json({ error: 'Body deve ser um array' });
+    const client = new Client({ connectionString: getDbUrl() });
+    await client.connect();
 
     for (const u of users) {
-      await prisma.user.upsert({
-        where: { email: u.email },
-        update: { nome: u.nome, pin_acesso: u.pin_acesso, role: u.nivel_acesso },
-        create: { email: u.email, nome: u.nome, pin_acesso: u.pin_acesso, role: u.nivel_acesso }
-      });
+      await client.query(
+        `INSERT INTO "User" (email, nome, pin_acesso, role, created_at) 
+         VALUES ($1, $2, $3, $4, now()) 
+         ON CONFLICT (email) DO UPDATE 
+         SET nome = EXCLUDED.nome, pin_acesso = EXCLUDED.pin_acesso, role = EXCLUDED.role`,
+        [u.email, u.nome, u.pin_acesso, u.nivel_acesso]
+      );
     }
+    await client.end();
     res.json({ success: true });
   } catch (error) {
     console.error('Erro no sync de usuários:', error);
