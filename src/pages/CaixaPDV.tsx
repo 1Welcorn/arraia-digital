@@ -76,7 +76,9 @@ export function CaixaPDV() {
   const [cartaoModalOpen, setCartaoModalOpen] = useState(false);
   const [dinheiroModalOpen, setDinheiroModalOpen] = useState(false);
   const [vendaSucessoModalOpen, setVendaSucessoModalOpen] = useState(false);
-  const [ultimaVendaCart, setUltimaVendaCart] = useState<{product: Produto, quantity: number}[]>([]);
+  const [fechamentoSucessoModalOpen, setFechamentoSucessoModalOpen] = useState(false);
+  const [ultimoRelatorioText, setUltimoRelatorioText] = useState('');
+  const [ultimaVendaCart, setUltimaVendaCart] = useState<CartItem[]>([]);
   const [ultimaVendaMethod, setUltimaVendaMethod] = useState<string>('');
 
   // Sangria
@@ -374,7 +376,9 @@ ARQUIVO DE SEGURANÇA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
+      setUltimoRelatorioText(reportText);
       setCloseCaixaModalOpen(false);
+      setFechamentoSucessoModalOpen(true);
       await loadInitialData();
       setCart([]);
       setCashPaid('');
@@ -954,7 +958,7 @@ ARQUIVO DE SEGURANÇA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
               )}
 
               {/* LISTA DE PRODUTOS */}
-              <div className="flex-1 overflow-y-auto pr-1 pb-44 lg:pb-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 align-content-start">
+              <div className="flex-1 overflow-y-auto pr-1 pb-64 lg:pb-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 align-content-start">
                 {sortedProducts.map((product) => {
                   const inCartQty = cart.find((item) => item.product.id === product.id)?.quantity || 0;
                   return (
@@ -962,15 +966,15 @@ ARQUIVO DE SEGURANÇA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
                       key={product.id}
                       onClick={() => handleAddToCart(product)}
                       disabled={product.ativo === 0}
-                      className={`group relative overflow-hidden flex items-center justify-between p-4 h-auto min-h-[120px] rounded-2xl border text-left transition-all duration-200 active:scale-[0.98] shadow-lg ${
+                      className={`group relative overflow-hidden flex items-center justify-between p-3 h-auto min-h-[90px] rounded-2xl border text-left transition-all duration-200 active:scale-[0.98] shadow-md ${
                         product.ativo === 0
                           ? 'opacity-40 bg-slate-950 border-slate-900 cursor-not-allowed'
-                          : `${product.cor_ficha} cursor-pointer hover:-translate-y-1 hover:shadow-xl`
+                          : `${product.cor_ficha} cursor-pointer hover:-translate-y-0.5 hover:shadow-lg`
                       }`}
                     >
                       <div className="flex-1 flex flex-col justify-center h-full pr-4 min-w-0">
-                        <div className="flex flex-col mb-2">
-                          <span className="font-black text-xl leading-snug line-clamp-2 text-white drop-shadow-sm">
+                        <div className="flex flex-col mb-1.5">
+                          <span className="font-black text-base sm:text-lg leading-tight line-clamp-2 text-white drop-shadow-sm">
                             {product.nome}
                           </span>
                           <span className="text-xs opacity-80 font-black uppercase mt-1 tracking-wider">
@@ -979,19 +983,19 @@ ARQUIVO DE SEGURANÇA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
                         </div>
 
                         <div className="flex flex-col w-full mt-auto gap-2">
-                          <span className="text-2xl font-black tracking-tight text-white drop-shadow">
+                          <span className="text-lg sm:text-xl font-black tracking-tight text-white drop-shadow">
                             R$ {product.preco.toFixed(2)}
                           </span>
                           
                           {/* Controles de Quantidade Kiosk */}
                           {inCartQty > 0 && (
                             <div className="flex items-center justify-between bg-black/40 rounded-lg p-1 w-full z-20 animate-fade-in" onClick={(e) => e.stopPropagation()}>
-                              <button onClick={() => handleDecrementCart(product.id)} className="w-9 h-9 flex items-center justify-center text-white bg-white/10 rounded-md active:bg-white/20 hover:bg-white/20 cursor-pointer">
-                                <Minus size={18} />
+                              <button onClick={() => handleDecrementCart(product.id)} className="w-7 h-7 flex items-center justify-center text-white bg-white/10 rounded-md active:bg-white/20 hover:bg-white/20 cursor-pointer">
+                                <Minus size={16} />
                               </button>
-                              <span className="font-black text-white text-base">{inCartQty}x</span>
-                              <button onClick={() => handleIncrementCart(product.id)} className="w-9 h-9 flex items-center justify-center text-white bg-white/10 rounded-md active:bg-white/20 hover:bg-white/20 cursor-pointer">
-                                <Plus size={18} />
+                              <span className="font-black text-white text-sm">{inCartQty}x</span>
+                              <button onClick={() => handleIncrementCart(product.id)} className="w-7 h-7 flex items-center justify-center text-white bg-white/10 rounded-md active:bg-white/20 hover:bg-white/20 cursor-pointer">
+                                <Plus size={16} />
                               </button>
                             </div>
                           )}
@@ -1000,7 +1004,7 @@ ARQUIVO DE SEGURANÇA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
 
                       {/* Imagem Ilustrativa da Categoria */}
                       {product.imagem && (
-                        <div className={`w-24 h-24 sm:w-28 sm:h-28 flex-shrink-0 rounded-xl overflow-hidden border border-black/15 bg-slate-900/10 flex items-center justify-center shadow-inner transition-transform duration-300 group-hover:scale-105 self-start ${inCartQty > 0 ? 'opacity-30 md:opacity-100' : ''}`}>
+                        <div className={`w-14 h-14 sm:w-20 sm:h-20 flex-shrink-0 rounded-xl overflow-hidden border border-black/15 bg-slate-900/10 flex items-center justify-center shadow-inner transition-transform duration-300 group-hover:scale-105 self-start ${inCartQty > 0 ? 'opacity-30 md:opacity-100' : ''}`}>
                           <img src={product.imagem} alt={product.nome} className="w-full h-full object-cover" />
                         </div>
                       )}
@@ -1835,6 +1839,43 @@ ARQUIVO DE SEGURANÇA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
                 className="w-full py-5 rounded-2xl bg-emerald-600 text-white hover:bg-emerald-500 active:scale-95 text-xl font-black transition-all cursor-pointer shadow-xl shadow-emerald-900/40 uppercase tracking-wider"
               >
                 Próximo Cliente ➔
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL SUCESSO DE FECHAMENTO (WHATSAPP RELATÓRIO) */}
+      {fechamentoSucessoModalOpen && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4">
+          <div className="w-full max-w-lg rounded-3xl border-2 border-emerald-500/50 bg-slate-900 p-6 md:p-8 shadow-[0_0_50px_rgba(16,185,129,0.3)] animate-scale-up flex flex-col">
+            <div className="flex flex-col items-center text-center mb-6">
+              <div className="w-20 h-20 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mb-4 shadow-inner border border-emerald-500/30">
+                <span className="text-4xl">✅</span>
+              </div>
+              <h2 className="text-3xl font-black text-white">Caixa Fechado!</h2>
+              <p className="text-emerald-400 font-bold mt-1 text-sm">O turno foi encerrado e os dados salvos.</p>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => {
+                  const message = encodeURIComponent(ultimoRelatorioText);
+                  window.open(`https://wa.me/5543999567378?text=${message}`, '_blank');
+                }}
+                className="w-full py-4 rounded-2xl bg-[#25D366] text-white hover:bg-[#1ebd5a] active:scale-95 text-lg font-black transition-all cursor-pointer shadow-lg shadow-green-900/40 flex items-center justify-center gap-2 uppercase tracking-wide"
+              >
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-message-circle"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>
+                Enviar Relatório p/ WhatsApp
+              </button>
+
+              <button
+                onClick={() => {
+                  setFechamentoSucessoModalOpen(false);
+                }}
+                className="w-full py-5 rounded-2xl bg-slate-800 text-white hover:bg-slate-700 active:scale-95 text-xl font-black transition-all cursor-pointer shadow-xl shadow-slate-900/40 uppercase tracking-wider"
+              >
+                Voltar à Tela Inicial
               </button>
             </div>
           </div>
