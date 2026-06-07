@@ -255,7 +255,7 @@ export function SuperDashboard() {
             <UserPlus size={18} className="text-amber-500" /> Adicionar Voluntário à Whitelist
           </h2>
 
-          <form onSubmit={handleAddUser} className="space-y-4">
+          <form onSubmit={handleAddUser} className="space-y-4" autoComplete="off">
             <div>
               <label className="block text-xs font-bold text-slate-400 mb-1">Nome Completo</label>
               <div className="relative">
@@ -264,6 +264,7 @@ export function SuperDashboard() {
                 </span>
                 <input
                   type="text"
+                  autoComplete="off"
                   placeholder="Ex: Prof. Willians"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
@@ -282,6 +283,7 @@ export function SuperDashboard() {
                   </span>
                   <input
                     type="text"
+                    autoComplete="off"
                     placeholder="email.institucional"
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
@@ -307,6 +309,7 @@ export function SuperDashboard() {
                 </span>
                 <input
                   type="password"
+                  autoComplete="new-password"
                   inputMode="numeric"
                   pattern="[0-9]*"
                   maxLength={6}
