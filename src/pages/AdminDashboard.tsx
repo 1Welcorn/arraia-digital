@@ -15,7 +15,8 @@ import {
   MessageSquare,
   Send,
   AlertTriangle,
-  Printer
+  Printer,
+  X
 } from 'lucide-react';
 import { authLocalService } from '../services/authLocalService';
 import type { UserSession } from '../services/authLocalService';
@@ -64,6 +65,56 @@ export function AdminDashboard() {
     () => db.mensagens.reverse().sortBy('timestamp'),
     []
   ) || [];
+
+  // Novo Produto State
+  const [novoProdutoModalOpen, setNovoProdutoModalOpen] = useState(false);
+  const [novoProdutoNome, setNovoProdutoNome] = useState('');
+  const [novoProdutoPreco, setNovoProdutoPreco] = useState('');
+  const [novoProdutoCategoria, setNovoProdutoCategoria] = useState('COMIDAS');
+
+  const handleCreateProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!novoProdutoNome.trim() || !novoProdutoPreco) return;
+    
+    let cor_ficha = 'bg-slate-500 text-white border-slate-400';
+    let imagem = '';
+    
+    if (novoProdutoCategoria === 'COMIDAS') {
+      cor_ficha = 'bg-amber-500 text-slate-900 border-amber-400';
+      imagem = '/images/comida.png';
+    } else if (novoProdutoCategoria === 'BEBIDAS') {
+      cor_ficha = 'bg-blue-600 text-white border-blue-400';
+      imagem = '/images/bebida.png';
+    } else if (novoProdutoCategoria === 'DOCES') {
+      cor_ficha = 'bg-orange-200 text-amber-950 border-amber-200';
+      imagem = '/images/doce.png';
+    } else if (novoProdutoCategoria === 'JOGOS') {
+      cor_ficha = 'bg-purple-600 text-white border-purple-400';
+      imagem = '/images/jogo.png';
+    }
+    
+    const newProduct: Produto = {
+      id: Date.now().toString(),
+      nome: novoProdutoNome,
+      preco: parseFloat(novoProdutoPreco.replace(',', '.')),
+      categoria: novoProdutoCategoria,
+      cor_ficha,
+      ativo: 1,
+      imagem
+    };
+    
+    await productRepository.saveProduct(newProduct);
+    
+    // Atualiza tabela localmente
+    setProducts(prev => [...prev, newProduct]);
+    setNovoProdutoModalOpen(false);
+    setNovoProdutoNome('');
+    setNovoProdutoPreco('');
+    setNovoProdutoCategoria('COMIDAS');
+    
+    apiClient.post('/sync/products', [newProduct]).catch(console.error);
+    alert('Produto adicionado com sucesso!');
+  };
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -719,6 +770,12 @@ export function AdminDashboard() {
                   <h3 className="text-base font-black flex items-center gap-2">
                     <Package size={18} className="text-amber-500" /> Tabela de Preços e Ativação de Produtos
                   </h3>
+                  <button 
+                    onClick={() => setNovoProdutoModalOpen(true)}
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold rounded-xl transition-colors flex items-center gap-2 shadow-lg shadow-emerald-900/20 cursor-pointer"
+                  >
+                    <span className="text-lg leading-none font-black">+</span> Novo
+                  </button>
                 </div>
 
                 <div className="overflow-x-auto">
@@ -1111,6 +1168,73 @@ export function AdminDashboard() {
                 Salvar p/ Todos
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: NOVO PRODUTO */}
+      {novoProdutoModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-slate-800 flex items-center justify-between">
+              <h3 className="text-xl font-black text-white flex items-center gap-2">
+                <Package size={22} className="text-amber-500" /> Novo Produto
+              </h3>
+              <button onClick={() => setNovoProdutoModalOpen(false)} className="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 cursor-pointer">
+                <X size={20} />
+              </button>
+            </div>
+            
+            <form onSubmit={handleCreateProduct} className="p-6 space-y-5">
+              <div>
+                <label className="block text-sm font-bold text-slate-300 mb-2">Nome do Produto</label>
+                <input 
+                  type="text" 
+                  value={novoProdutoNome}
+                  onChange={e => setNovoProdutoNome(e.target.value)}
+                  placeholder="Ex: Milho Cozido"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3.5 text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-slate-300 mb-2">Preço (R$)</label>
+                <input 
+                  type="number" 
+                  step="0.01"
+                  min="0"
+                  value={novoProdutoPreco}
+                  onChange={e => setNovoProdutoPreco(e.target.value)}
+                  placeholder="Ex: 5.00"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3.5 text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-slate-300 mb-2">Categoria</label>
+                <select 
+                  value={novoProdutoCategoria}
+                  onChange={e => setNovoProdutoCategoria(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3.5 text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none cursor-pointer"
+                >
+                  <option value="COMIDAS">Comidas</option>
+                  <option value="BEBIDAS">Bebidas</option>
+                  <option value="DOCES">Doces</option>
+                  <option value="JOGOS">Jogos</option>
+                </select>
+              </div>
+
+              <div className="pt-4 border-t border-slate-800">
+                <button 
+                  type="submit"
+                  className="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl transition-all shadow-lg shadow-amber-500/20 cursor-pointer"
+                >
+                  Cadastrar Produto
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
