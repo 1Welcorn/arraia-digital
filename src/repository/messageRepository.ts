@@ -1,5 +1,6 @@
 import { db } from '../database/DatabaseConnection';
 import type { Mensagem } from '../database/DatabaseConnection';
+import { apiClient } from '../services/apiClient';
 
 // Helper para gerar UUIDv4
 function generateUUID() {
@@ -20,6 +21,8 @@ export const messageRepository = {
       timestamp: Date.now()
     };
     await db.mensagens.put(msg);
+    // Envia para a nuvem
+    apiClient.post('/sync/messages', msg).catch(console.error);
     return msg.id;
   },
 
@@ -34,6 +37,8 @@ export const messageRepository = {
       timestamp: Date.now()
     };
     await db.mensagens.put(msg);
+    // Envia para a nuvem
+    apiClient.post('/sync/messages', msg).catch(console.error);
     return msg.id;
   },
 

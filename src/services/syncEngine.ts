@@ -1,6 +1,7 @@
 import { saleRepository } from '../repository/saleRepository';
 import { db } from '../database/DatabaseConnection';
 import { apiClient } from './apiClient';
+import { authLocalService } from './authLocalService';
 
 type SyncCallback = (status: { online: boolean; syncing: boolean; pendingCount: number }) => void;
 
@@ -151,7 +152,9 @@ class SyncEngineManager {
 
       // 4. PULL DE MENSAGENS
       try {
-        const msgRes = await apiClient.get('/sync/messages');
+        const user = authLocalService.getCurrentUser();
+        const url = user?.email ? `/sync/messages?email=${encodeURIComponent(user.email)}` : '/sync/messages';
+        const msgRes = await apiClient.get(url);
         if (msgRes.data && Array.isArray(msgRes.data)) {
           // Atualiza o banco local apenas com as mensagens mais recentes
           await db.mensagens.bulkPut(msgRes.data);

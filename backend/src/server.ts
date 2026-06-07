@@ -164,6 +164,32 @@ app.get('/api/sync/users', async (req, res) => {
   }
 });
 
+// Obter lista de mensagens - Rota Antiga (refeita mais abaixo de forma melhorada)
+
+// Enviar mensagem para a Nuvem
+app.post('/api/sync/messages', authenticateToken, async (req: any, res) => {
+  try {
+    const msg = req.body;
+    await prisma.message.upsert({
+      where: { id: msg.id },
+      update: { lida: msg.lida },
+      create: {
+        id: msg.id,
+        tipo: msg.tipo,
+        destinatarioEmail: msg.destinatarioEmail || null,
+        remetente: msg.remetente,
+        conteudo: msg.conteudo,
+        timestamp: msg.timestamp,
+        lida: msg.lida || false
+      }
+    });
+    res.json({ success: true });
+  } catch (error: any) {
+    console.error('Erro ao salvar mensagem:', error);
+    res.status(500).json({ error: 'Erro ao salvar mensagem' });
+  }
+});
+
 // Puxar produtos mais recentes
 app.get('/api/sync/products', authenticateToken, async (req, res) => {
   try {
@@ -177,7 +203,7 @@ app.get('/api/sync/products', authenticateToken, async (req, res) => {
 // Puxar mensagens
 app.get('/api/sync/messages', authenticateToken, async (req: any, res) => {
   try {
-    const email = req.user.email;
+    const email = req.query.email || req.user.email;
     const messages = await prisma.message.findMany({
       where: {
         OR: [
