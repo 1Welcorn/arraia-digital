@@ -76,7 +76,7 @@ class SyncEngineManager {
   async syncUsersOnly(): Promise<void> {
     if (!this.online) return;
     try {
-      const usersRes = await apiClient.get('/sync/users');
+      const usersRes = await apiClient.get('/sync/users?t=' + Date.now());
       if (usersRes.data && Array.isArray(usersRes.data)) {
         const mappedUsers = usersRes.data.map((u: any) => ({
           email: u.email,
@@ -142,7 +142,7 @@ class SyncEngineManager {
 
       // 3. PULL DE PRODUTOS
       try {
-        const prodRes = await apiClient.get('/sync/products');
+        const prodRes = await apiClient.get('/sync/products?t=' + Date.now());
         if (prodRes.data && Array.isArray(prodRes.data)) {
           await db.produtos.bulkPut(prodRes.data);
         }
@@ -153,8 +153,9 @@ class SyncEngineManager {
       // 4. PULL DE MENSAGENS
       try {
         const user = authLocalService.getCurrentUser();
-        const url = user?.email ? `/sync/messages?email=${encodeURIComponent(user.email)}` : '/sync/messages';
-        const msgRes = await apiClient.get(url);
+        const baseMsgUrl = user?.email ? `/sync/messages?email=${encodeURIComponent(user.email)}` : '/sync/messages';
+        const msgUrl = baseMsgUrl + (baseMsgUrl.includes('?') ? '&t=' : '?t=') + Date.now();
+        const msgRes = await apiClient.get(msgUrl);
         if (msgRes.data && Array.isArray(msgRes.data)) {
           // Atualiza o banco local apenas com as mensagens mais recentes
           await db.mensagens.bulkPut(msgRes.data);
