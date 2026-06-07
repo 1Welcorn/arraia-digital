@@ -124,11 +124,31 @@ export function AdminDashboard() {
     apiClient.get('/settings/pix').then(res => setGlobalPixConfig(res.data)).catch(() => {});
 
     const unsubscribe = syncEngine.subscribe((status) => {
-      setSyncStatus(status);
+      setSyncStatus((prev) => {
+        // Se acabou de sincronizar com sucesso, recarrega a tela na hora
+        if (prev.syncing && !status.syncing && !status.error) {
+          loadData();
+        }
+        return status;
+      });
     });
+
+    // Auto-refresh: A cada 10 segundos recarrega o que tem no banco local (IndexedDB)
+    // E a cada 20 segundos força uma puxada na nuvem
+    const refreshInterval = setInterval(() => {
+      loadData();
+    }, 10000);
+
+    const syncInterval = setInterval(() => {
+      if (syncEngine.online) {
+        syncEngine.syncNow();
+      }
+    }, 20000);
 
     return () => {
       unsubscribe();
+      clearInterval(refreshInterval);
+      clearInterval(syncInterval);
     };
   }, [navigate]);
 
