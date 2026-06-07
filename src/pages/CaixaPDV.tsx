@@ -334,7 +334,10 @@ export function CaixaPDV() {
         parsedContado,
         dif,
         activeSession?.suprimentos || [],
-      // GERAR RELATORIO DE BACKUP DE SEGURANÇA
+        vCartao
+      );
+
+      // GERAR RELATORIO DE BACKUP DE SEGURANCA
       let reportText = `===========================================
 RELATORIO DE FECHAMENTO DE CAIXA (BACKUP DE SEGURANCA)
 ===========================================

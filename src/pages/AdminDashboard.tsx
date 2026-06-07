@@ -126,7 +126,7 @@ export function AdminDashboard() {
     const unsubscribe = syncEngine.subscribe((status) => {
       setSyncStatus((prev) => {
         // Se acabou de sincronizar com sucesso, recarrega a tela na hora
-        if (prev.syncing && !status.syncing && !status.error) {
+        if (prev.syncing && !status.syncing && !(status as any).error) {
           loadData();
         }
         return status;
