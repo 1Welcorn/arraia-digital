@@ -652,7 +652,7 @@ export function CaixaPDV() {
     <div className="flex flex-col h-full w-full bg-slate-900 text-white select-none">
       
       {/* HEADER DO OPERADOR */}
-      <header className="flex items-center justify-between border-b border-slate-800 bg-slate-950 px-3 md:px-6 pt-10 pb-3 md:py-4 shadow-md gap-2">
+      <header className="flex items-center justify-between border-b border-slate-800 bg-slate-950 px-3 md:px-6 py-3 md:py-4 shadow-md gap-2">
         <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
           <span className="text-2xl md:text-3xl">🔥</span>
           <div className="hidden sm:block">
@@ -826,7 +826,7 @@ export function CaixaPDV() {
           // OPERAÇÃO DO CAIXA (PDV GRID + CARRINHO)
           <>
             {/* GRID DE PRODUTOS */}
-            <div className="flex-1 flex flex-col p-4 md:p-6 pb-44 lg:pb-6 overflow-hidden relative">
+            <div className="flex-1 flex flex-col p-4 md:p-6 overflow-hidden relative">
               
               {/* FILTROS E ORDENAÇÃO */}
               <div className="flex items-center justify-between gap-4 mb-4 bg-slate-950/30 p-2.5 rounded-2xl border border-slate-800/60 pb-2">
@@ -915,7 +915,7 @@ export function CaixaPDV() {
               )}
 
               {/* LISTA DE PRODUTOS */}
-              <div className="flex-1 overflow-y-auto pr-1 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 align-content-start">
+              <div className="flex-1 overflow-y-auto pr-1 pb-44 lg:pb-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 align-content-start">
                 {sortedProducts.map((product) => {
                   const inCartQty = cart.find((item) => item.product.id === product.id)?.quantity || 0;
                   return (
