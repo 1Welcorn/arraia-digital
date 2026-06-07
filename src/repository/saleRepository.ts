@@ -30,7 +30,7 @@ export const saleRepository = {
     troco?: number
   ): Promise<string> {
     return vendaRepo.salvarVendaLocal({
-      device_id: 'device-local-tablet',
+      device_id: _operadorEmail || 'device-local-tablet',
       valor_total: valorTotal,
       metodo_pagamento: metodoPagamento,
       codigo_pix_utilizado: codigoPixUtilizado,

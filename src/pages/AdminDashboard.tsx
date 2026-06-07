@@ -571,8 +571,17 @@ export function AdminDashboard() {
                       {caixaSessions.map((session, index) => {
                         const totalS = (session.sangrias || []).reduce((acc, s) => acc + s.valor, 0);
                         const totalSup = (session.suprimentos || []).reduce((acc, s) => acc + s.valor, 0);
-                        const vDin = session.vendasDinheiro || 0;
-                        const vPix = session.vendasPix || 0;
+                        let vDin = session.vendasDinheiro || 0;
+                        let vPix = session.vendasPix || 0;
+                        let vCar = session.vendasCartao || 0;
+
+                        // Se o caixa está aberto, precisamos calcular as vendas ao vivo varrendo as notas fiscais
+                        if (session.status === 'aberto') {
+                          vDin = sales.filter(s => s.device_id === session.operadorEmail && new Date(s.criado_em).getTime() >= session.timestampAbertura && s.metodo_pagamento === 'DINHEIRO').reduce((acc, s) => acc + s.valor_total, 0);
+                          vPix = sales.filter(s => s.device_id === session.operadorEmail && new Date(s.criado_em).getTime() >= session.timestampAbertura && s.metodo_pagamento === 'PIX_LOCAL').reduce((acc, s) => acc + s.valor_total, 0);
+                          vCar = sales.filter(s => s.device_id === session.operadorEmail && new Date(s.criado_em).getTime() >= session.timestampAbertura && s.metodo_pagamento === 'CARTAO').reduce((acc, s) => acc + s.valor_total, 0);
+                        }
+
                         const est = session.valorAbertura + vDin + totalSup - totalS;
                         return (
                           <tr key={index} className="hover:bg-slate-900/30 text-xs">
@@ -599,7 +608,7 @@ export function AdminDashboard() {
                             <td className="px-6 py-4 font-mono">
                               <span className="text-emerald-400 block font-semibold">💸 Din: R$ {vDin.toFixed(2)}</span>
                               <span className="text-cyan-400 block font-semibold">⚡ Pix: R$ {vPix.toFixed(2)}</span>
-                              <span className="text-purple-400 block font-semibold">💳 Car: R$ {(session.vendasCartao || 0).toFixed(2)}</span>
+                              <span className="text-purple-400 block font-semibold">💳 Car: R$ {vCar.toFixed(2)}</span>
                             </td>
                             <td className="px-6 py-4">
                               {session.valorFechamento != null ? (
