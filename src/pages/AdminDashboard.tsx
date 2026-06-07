@@ -157,13 +157,63 @@ export function AdminDashboard() {
       const allProducts = await productRepository.getAllProducts();
       setProducts(allProducts);
 
-      const allSales = await saleRepository.getAllSales();
+      // Tenta buscar vendas da Nuvem Global primeiro
+      let allSales: any[] = [];
+      let allItems: any[] = [];
+      const userStr = localStorage.getItem('user_session');
+      const userObj = userStr ? JSON.parse(userStr) : null;
+      
+      try {
+        const API_URL = import.meta.env.VITE_API_URL || window.location.origin + '/api';
+        const res = await fetch(`${API_URL}/sync/sales`, {
+          headers: {
+            'Authorization': `Bearer ${userObj?.pin_acesso}`
+          }
+        });
+        
+        if (res.ok) {
+          const cloudSales = await res.json();
+          // Converte do formato Cloud para o formato Local esperado na tabela
+          allSales = cloudSales.map((cs: any) => ({
+            id: cs.id,
+            device_id: cs.device_id,
+            valor_total: cs.valor_total,
+            metodo_pagamento: cs.metodo_pagamento,
+            codigo_pix_utilizado: cs.codigo_pix_utilizado,
+            valor_pago: cs.valor_pago,
+            troco: cs.troco,
+            criado_em: cs.criado_em,
+            status_sync: 'synced'
+          }));
+          
+          for (const cs of cloudSales) {
+            if (cs.items) {
+              for (const ci of cs.items) {
+                allItems.push({
+                  id: ci.id,
+                  venda_id: cs.id,
+                  produto_id: ci.produto_id,
+                  quantidade: ci.quantidade,
+                  preco_unitario: ci.preco_unitario
+                });
+              }
+            }
+          }
+        } else {
+          throw new Error('Falha na nuvem');
+        }
+      } catch (err) {
+        // Fallback para disco local em caso de erro
+        console.warn("Lendo vendas do disco local como fallback...", err);
+        allSales = await saleRepository.getAllSales();
+        allItems = await db.itens_venda.toArray();
+      }
+
       // Ordena por data decrescente (mais recente primeiro)
       allSales.sort((a, b) => new Date(b.criado_em).getTime() - new Date(a.criado_em).getTime());
       setSales(allSales);
 
       // Carrega itens de venda e agrupa por venda_id
-      const allItems = await db.itens_venda.toArray();
       const itemsMap: Record<string, ItemVenda[]> = {};
       for (const item of allItems) {
         if (!itemsMap[item.venda_id]) {
