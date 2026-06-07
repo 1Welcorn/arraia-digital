@@ -93,8 +93,8 @@ export function AdminDashboard() {
     try {
       setSyncStatus(prev => ({ ...prev, syncing: true }));
       
-      // 1. Limpa na nuvem
-      await apiClient.post('/api/reset-test-data');
+      // 1. Limpa na nuvem (removido o /api extra porque o apiClient já o embute)
+      await apiClient.post('/reset-test-data');
       
       // 2. Limpa no banco local (Dexie)
       await db.vendas.clear();
