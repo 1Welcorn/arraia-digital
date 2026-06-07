@@ -223,7 +223,7 @@ app.get('/api/sync/messages', authenticateToken, async (req: any, res) => {
 // Puxar sessões de caixa (para o Admin)
 app.get('/api/sync/sessions', authenticateToken, async (req, res) => {
   try {
-    const sessions = await prisma.caixaSession.findMany();
+    const sessions = await prisma.$queryRaw`SELECT * FROM "CaixaSession"`;
     res.json(sessions);
   } catch (error: any) {
     res.status(500).json({ error: 'Erro ao buscar sessões de caixa', details: error.message });
@@ -233,14 +233,18 @@ app.get('/api/sync/sessions', authenticateToken, async (req, res) => {
 // Puxar vendas (para o Admin)
 app.get('/api/sync/sales', authenticateToken, async (req, res) => {
   try {
-    const sales = await prisma.sale.findMany({
-      include: {
-        items: true
-      }
-    });
-    res.json(sales);
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar vendas' });
+    const sales: any[] = await prisma.$queryRaw`SELECT * FROM "Sale"`;
+    const items: any[] = await prisma.$queryRaw`SELECT * FROM "SaleItem"`;
+    
+    // Attach items to their respective sales manually
+    const salesWithItems = sales.map(sale => ({
+      ...sale,
+      items: items.filter(item => item.sale_id === sale.id)
+    }));
+    
+    res.json(salesWithItems);
+  } catch (error: any) {
+    res.status(500).json({ error: 'Erro ao buscar vendas', details: error.message });
   }
 });
 
