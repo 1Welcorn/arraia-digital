@@ -1,5 +1,6 @@
 import { db } from '../database/DatabaseConnection';
 import type { Produto } from '../database/DatabaseConnection';
+import { apiClient } from '../services/apiClient';
 
 export const productRepository = {
   async seedDefaultProducts(): Promise<void> {
@@ -7,38 +8,55 @@ export const productRepository = {
     if (count === 0) {
       const defaultProducts: Produto[] = [
         { id: '1', nome: 'Pamonha Quentinha', preco: 8.00, categoria: 'COMIDAS', cor_ficha: 'bg-amber-500 text-slate-900 border-amber-400', ativo: 1, imagem: '/images/comida.png' },
-        { id: '2', nome: 'Quentão Aromático', preco: 6.00, categoria: 'BEBIDAS', cor_ficha: 'bg-red-700 text-white border-red-500', ativo: 1, imagem: '/images/bebida.png' },
-        { id: '3', nome: 'Pastel de Carne/Queijo', preco: 7.00, categoria: 'COMIDAS', cor_ficha: 'bg-orange-500 text-white border-orange-400', ativo: 1, imagem: '/images/comida.png' },
-        { id: '4', nome: 'Pipoca na Manteiga', preco: 4.00, categoria: 'COMIDAS', cor_ficha: 'bg-yellow-400 text-slate-900 border-yellow-300', ativo: 1, imagem: '/images/comida.png' },
+        { id: '2', nome: 'Quentão Aromático', preco: 6.00, categoria: 'BEBIDAS', cor_ficha: 'bg-blue-600 text-white border-blue-400', ativo: 1, imagem: '/images/bebida.png' },
+        { id: '3', nome: 'Pastel de Carne/Queijo', preco: 7.00, categoria: 'COMIDAS', cor_ficha: 'bg-amber-500 text-slate-900 border-amber-400', ativo: 1, imagem: '/images/comida.png' },
+        { id: '4', nome: 'Pipoca na Manteiga', preco: 4.00, categoria: 'COMIDAS', cor_ficha: 'bg-amber-500 text-slate-900 border-amber-400', ativo: 1, imagem: '/images/comida.png' },
         { id: '5', nome: 'Canjica Cremosa', preco: 6.00, categoria: 'DOCES', cor_ficha: 'bg-orange-200 text-amber-950 border-amber-200', ativo: 1, imagem: '/images/doce.png' },
-        { id: '6', nome: 'Cachorro Quente', preco: 8.00, categoria: 'COMIDAS', cor_ficha: 'bg-amber-600 text-white border-amber-500', ativo: 1, imagem: '/images/comida.png' },
-        { id: '7', nome: 'Bolo de Milho', preco: 5.00, categoria: 'DOCES', cor_ficha: 'bg-yellow-600 text-white border-yellow-500', ativo: 1, imagem: '/images/doce.png' },
+        { id: '6', nome: 'Cachorro Quente', preco: 8.00, categoria: 'COMIDAS', cor_ficha: 'bg-amber-500 text-slate-900 border-amber-400', ativo: 1, imagem: '/images/comida.png' },
+        { id: '7', nome: 'Bolo de Milho', preco: 5.00, categoria: 'DOCES', cor_ficha: 'bg-orange-200 text-amber-950 border-amber-200', ativo: 1, imagem: '/images/doce.png' },
         { id: '8', nome: 'Refrigerante Lata', preco: 5.00, categoria: 'BEBIDAS', cor_ficha: 'bg-blue-600 text-white border-blue-400', ativo: 1, imagem: '/images/bebida.png' },
-        { id: '9', nome: 'Água Mineral', preco: 3.00, categoria: 'BEBIDAS', cor_ficha: 'bg-cyan-500 text-slate-900 border-cyan-300', ativo: 1, imagem: '/images/bebida.png' },
-        { id: '10', nome: 'Pescaria Caipira', preco: 5.00, categoria: 'JOGOS', cor_ficha: 'bg-indigo-600 text-white border-indigo-400', ativo: 1, imagem: '/images/jogo.png' },
+        { id: '9', nome: 'Água Mineral', preco: 3.00, categoria: 'BEBIDAS', cor_ficha: 'bg-blue-600 text-white border-blue-400', ativo: 1, imagem: '/images/bebida.png' },
+        { id: '10', nome: 'Pescaria Caipira', preco: 5.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/jogo.png' },
         { id: '11', nome: 'Boca do Palhaço', preco: 5.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/jogo.png' },
-        { id: '12', nome: 'Argolas', preco: 5.00, categoria: 'JOGOS', cor_ficha: 'bg-fuchsia-600 text-white border-fuchsia-400', ativo: 1, imagem: '/images/jogo.png' },
+        { id: '12', nome: 'Argolas', preco: 5.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/jogo.png' },
       ];
 
       await db.produtos.bulkAdd(defaultProducts);
       console.log('Produtos semeados via Dexie com sucesso!');
     } else {
-      // Garante que todos os produtos existentes ganham suas respectivas imagens
+      // Garante que todos os produtos existentes ganham suas respectivas imagens e cores padronizadas
       const existing = await db.produtos.toArray();
       let updatedCount = 0;
       for (const prod of existing) {
+        let changed = false;
+        
         if (!prod.imagem) {
           if (prod.categoria === 'COMIDAS') prod.imagem = '/images/comida.png';
           else if (prod.categoria === 'BEBIDAS') prod.imagem = '/images/bebida.png';
           else if (prod.categoria === 'DOCES') prod.imagem = '/images/doce.png';
           else if (prod.categoria === 'JOGOS') prod.imagem = '/images/jogo.png';
-          
+          changed = true;
+        }
+
+        const expectedColor = 
+          prod.categoria === 'COMIDAS' ? 'bg-amber-500 text-slate-900 border-amber-400' :
+          prod.categoria === 'BEBIDAS' ? 'bg-blue-600 text-white border-blue-400' :
+          prod.categoria === 'DOCES' ? 'bg-orange-200 text-amber-950 border-amber-200' :
+          'bg-purple-600 text-white border-purple-400';
+
+        if (prod.cor_ficha !== expectedColor) {
+          prod.cor_ficha = expectedColor;
+          changed = true;
+        }
+        
+        if (changed) {
           await db.produtos.put(prod);
+          apiClient.post('/sync/products', [prod]).catch(() => {});
           updatedCount++;
         }
       }
       if (updatedCount > 0) {
-        console.log(`Atualizados ${updatedCount} produtos com imagens no banco de dados local.`);
+        console.log(`Atualizados ${updatedCount} produtos com imagens/cores padronizadas.`);
       }
     }
   },
