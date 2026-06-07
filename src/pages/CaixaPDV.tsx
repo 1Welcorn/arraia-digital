@@ -977,14 +977,14 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
                           if (product.ativo !== 0) handleAddToCart(product);
                         }
                       }}
-                      className={`group relative overflow-hidden flex items-stretch justify-between p-3 h-auto min-h-[105px] rounded-2xl border text-left transition-all duration-200 active:scale-[0.98] shadow-md select-none ${
+                      className={`group relative flex items-stretch justify-between p-3 min-h-[110px] rounded-2xl border text-left transition-all duration-200 active:scale-[0.98] shadow-md select-none ${
                         product.ativo === 0
                           ? 'opacity-40 bg-slate-950 border-slate-900 cursor-not-allowed'
                           : `${product.cor_ficha} cursor-pointer hover:-translate-y-0.5 hover:shadow-lg`
                       }`}
                     >
-                      <div className="flex-1 flex flex-col justify-between pr-4 min-w-0 py-0.5">
-                        <div className="flex flex-col mb-1.5">
+                      <div className="flex-1 flex flex-col pr-4 min-w-0">
+                        <div className="flex flex-col mb-3">
                           <span className="font-black text-base sm:text-lg leading-tight line-clamp-2 text-white drop-shadow-sm">
                             {product.nome}
                           </span>
@@ -993,20 +993,20 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
                           </span>
                         </div>
 
-                        <div className="flex flex-col w-full mt-auto gap-2">
+                        <div className="flex flex-col w-full gap-2 mt-auto">
                           <span className="text-lg sm:text-xl font-black tracking-tight text-white drop-shadow">
                             R$ {product.preco.toFixed(2)}
                           </span>
                           
                           {/* Controles de Quantidade Kiosk */}
                           {inCartQty > 0 && (
-                            <div className="flex items-center justify-between bg-black/40 rounded-lg p-1 w-full z-20 animate-fade-in" onClick={(e) => e.stopPropagation()}>
-                              <button type="button" onClick={() => handleDecrementCart(product.id)} className="w-7 h-7 flex items-center justify-center text-white bg-white/10 rounded-md active:bg-white/20 hover:bg-white/20 cursor-pointer">
-                                <Minus size={16} />
+                            <div className="flex items-center justify-between bg-black/40 rounded-lg p-1.5 w-full z-20 animate-fade-in" onClick={(e) => e.stopPropagation()}>
+                              <button type="button" onClick={() => handleDecrementCart(product.id)} className="w-8 h-8 flex items-center justify-center text-white bg-white/10 rounded-md active:bg-white/30 hover:bg-white/20 cursor-pointer transition-colors">
+                                <Minus size={18} />
                               </button>
-                              <span className="font-black text-white text-sm">{inCartQty}x</span>
-                              <button type="button" onClick={() => handleIncrementCart(product.id)} className="w-7 h-7 flex items-center justify-center text-white bg-white/10 rounded-md active:bg-white/20 hover:bg-white/20 cursor-pointer">
-                                <Plus size={16} />
+                              <span className="font-black text-white text-base">{inCartQty}x</span>
+                              <button type="button" onClick={() => handleIncrementCart(product.id)} className="w-8 h-8 flex items-center justify-center text-white bg-white/10 rounded-md active:bg-white/30 hover:bg-white/20 cursor-pointer transition-colors">
+                                <Plus size={18} />
                               </button>
                             </div>
                           )}
