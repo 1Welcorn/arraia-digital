@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "reset:tests": "ts-node reset-test-data.ts",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "build": "prisma generate"
   },
   "keywords": [],
   "author": "",
