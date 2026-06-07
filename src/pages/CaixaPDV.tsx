@@ -613,68 +613,73 @@ export function CaixaPDV() {
     <div className="flex flex-col h-full w-full bg-slate-900 text-white select-none">
       
       {/* HEADER DO OPERADOR */}
-      <header className="flex items-center justify-between border-b border-slate-800 bg-slate-950 px-6 py-4 shadow-md">
-        <div className="flex items-center gap-3">
-          <span className="text-3xl">🔥</span>
-          <div>
-            <h1 className="text-xl font-bold tracking-tight text-amber-500">Arraiá Digital</h1>
-            <p className="text-xs text-slate-400">Escola Ativa • Frente de Caixa</p>
+      <header className="flex items-center justify-between border-b border-slate-800 bg-slate-950 px-3 md:px-6 py-3 md:py-4 shadow-md gap-2">
+        <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
+          <span className="text-2xl md:text-3xl">🔥</span>
+          <div className="hidden sm:block">
+            <h1 className="text-lg md:text-xl font-bold tracking-tight text-amber-500 leading-tight">Arraiá Digital</h1>
+            <p className="text-[10px] md:text-xs text-slate-400 leading-tight">Escola Ativa • Frente de Caixa</p>
           </div>
         </div>
 
         {/* STATUS DE SINCRONIZAÇÃO E REDE */}
-        <div className="flex items-center gap-4">
-          <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
+        {/* STATUS DE SINCRONIZAÇÃO E REDE */}
+        <div className="flex items-center gap-2 md:gap-4 flex-shrink min-w-0 justify-end">
+          <div className={`flex items-center gap-1.5 px-2 md:px-3 py-1 rounded-full text-[10px] md:text-xs font-semibold whitespace-nowrap ${
             syncStatus.online ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
           }`}>
             {syncStatus.online ? <Wifi size={14} /> : <WifiOff size={14} />}
-            <span>{syncStatus.online ? 'Online' : 'Offline'}</span>
+            <span className="hidden sm:inline">{syncStatus.online ? 'Online' : 'Offline'}</span>
           </div>
 
           {syncStatus.pendingCount > 0 && (
             <button
               onClick={() => syncEngine.syncNow()}
               disabled={syncStatus.syncing || !syncStatus.online}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all ${
+              className={`flex items-center gap-1.5 px-2 md:px-3 py-1 rounded-full text-[10px] md:text-xs font-bold transition-all whitespace-nowrap ${
                 syncStatus.online 
                   ? 'bg-amber-500 text-slate-950 hover:bg-amber-400 cursor-pointer' 
                   : 'bg-slate-800 text-slate-500 cursor-not-allowed'
               }`}
             >
               <Activity size={14} className={syncStatus.syncing ? 'animate-spin' : ''} />
-              <span>{syncStatus.syncing ? 'Sincronizando...' : `${syncStatus.pendingCount} pendentes`}</span>
+              <span>{syncStatus.syncing ? 'Sync...' : <><span className="sm:hidden">{syncStatus.pendingCount}</span><span className="hidden sm:inline">{syncStatus.pendingCount} pendentes</span></>}</span>
             </button>
           )}
 
           {/* PERFIS & CONFIG */}
-          <div className="flex items-center gap-4 border-l border-slate-800 pl-4">
+          {/* PERFIS & CONFIG */}
+          <div className="flex items-center gap-2 md:gap-4 border-l border-slate-800 pl-2 md:pl-4 flex-shrink-0">
             {/* SINO DE NOTIFICAÇÕES */}
             <div className="relative">
               <button
                 onClick={() => setMensagensModalOpen(true)}
-                className={`p-2 rounded-xl border transition-colors cursor-pointer ${
+                className={`p-1.5 md:p-2 rounded-xl border transition-colors cursor-pointer ${
                   mensagensNaoLidas.length > 0
                     ? 'bg-rose-500/10 border-rose-500/40 text-rose-500 hover:bg-rose-500/20'
                     : 'bg-slate-800/50 border-slate-700/50 text-slate-400 hover:bg-slate-800 hover:text-slate-300'
                 }`}
               >
                 {mensagensNaoLidas.length > 0 ? (
-                  <BellRing size={20} className="animate-pulse" />
+                  <BellRing size={16} className="md:w-5 md:h-5 animate-pulse" />
                 ) : (
-                  <Bell size={20} />
+                  <Bell size={16} className="md:w-5 md:h-5" />
                 )}
                 
                 {mensagensNaoLidas.length > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center min-w-[20px] h-[20px] px-1 rounded-full bg-rose-500 text-white text-[10px] font-black border-2 border-slate-950">
+                  <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center min-w-[16px] h-[16px] md:min-w-[20px] md:h-[20px] px-1 rounded-full bg-rose-500 text-white text-[8px] md:text-[10px] font-black border-2 border-slate-950">
                     {mensagensNaoLidas.length}
                   </span>
                 )}
               </button>
             </div>
 
-            <span className="flex items-center gap-1 text-sm font-medium text-slate-300 ml-2">
-              <User size={16} className="text-amber-500" />
-              {user?.nome} ({user?.role === 'SUPER_ADMIN' ? 'Super Admin' : user?.role === 'ADMIN_OPERACIONAL' ? 'Admin' : 'Operador'})
+            <span className="flex items-center gap-1 text-xs md:text-sm font-medium text-slate-300 ml-1 md:ml-2 whitespace-nowrap">
+              <User size={14} className="text-amber-500 md:w-4 md:h-4" />
+              <span className="max-w-[70px] md:max-w-none truncate">{user?.nome.split(' ')[0]}</span>
+              <span className="hidden lg:inline text-slate-500">
+                ({user?.role === 'SUPER_ADMIN' ? 'Super Admin' : user?.role === 'ADMIN_OPERACIONAL' ? 'Admin' : 'Operador'})
+              </span>
             </span>
 
             {authLocalService.checkRole('ADMIN_OPERACIONAL') && (
