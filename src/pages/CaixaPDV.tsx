@@ -977,13 +977,13 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
                           if (product.ativo !== 0) handleAddToCart(product);
                         }
                       }}
-                      className={`group relative flex items-stretch justify-between p-3 min-h-[110px] rounded-2xl border text-left transition-all duration-200 active:scale-[0.98] shadow-md select-none ${
+                      className={`group relative grid grid-cols-[1fr_auto] gap-3 p-3 min-h-[110px] rounded-2xl border text-left transition-all duration-200 active:scale-[0.98] shadow-md select-none ${
                         product.ativo === 0
                           ? 'opacity-40 bg-slate-950 border-slate-900 cursor-not-allowed'
                           : `${product.cor_ficha} cursor-pointer hover:-translate-y-0.5 hover:shadow-lg`
                       }`}
                     >
-                      <div className="flex-1 flex flex-col pr-4 min-w-0">
+                      <div className="flex flex-col min-w-0">
                         <div className="flex flex-col mb-3">
                           <span className="font-black text-base sm:text-lg leading-tight line-clamp-2 text-white drop-shadow-sm">
                             {product.nome}
@@ -1015,7 +1015,7 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
 
                       {/* Imagem Ilustrativa da Categoria */}
                       {product.imagem && (
-                        <div className={`w-14 h-14 sm:w-20 sm:h-20 flex-shrink-0 rounded-xl overflow-hidden border border-black/15 bg-slate-900/10 flex items-center justify-center shadow-inner transition-transform duration-300 group-hover:scale-105 self-start ${inCartQty > 0 ? 'opacity-30 md:opacity-100' : ''}`}>
+                        <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-xl overflow-hidden border border-black/15 bg-slate-900/10 flex items-center justify-center shadow-inner transition-transform duration-300 group-hover:scale-105 self-start ${inCartQty > 0 ? 'opacity-30 md:opacity-100' : ''}`}>
                           <img src={product.imagem} alt={product.nome} className="w-full h-full object-cover" />
                         </div>
                       )}
