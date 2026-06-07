@@ -23,7 +23,8 @@ import {
   MessageSquare,
   X,
   ChevronDown,
-  Lock
+  Lock,
+  Key
 } from 'lucide-react';
 import { authLocalService } from '../services/authLocalService';
 import type { UserSession } from '../services/authLocalService';
@@ -62,8 +63,6 @@ export function CaixaPDV() {
   ) || [];
   const mensagensNaoLidas = mensagensLivres.filter(m => !m.lida);
   const [mensagensModalOpen, setMensagensModalOpen] = useState(false);
-  const [saleError, setSaleError] = useState('');
-
   // Estados de Abertura de Caixa
   const [openingBalance, setOpeningBalance] = useState<string>('');
   const [adminPin, setAdminPin] = useState('');
