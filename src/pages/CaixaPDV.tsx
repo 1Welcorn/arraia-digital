@@ -33,6 +33,7 @@ import { productRepository } from '../repository/productRepository';
 import { saleRepository } from '../repository/saleRepository';
 import type { LocalCaixaSession } from '../repository/saleRepository';
 import { messageRepository } from '../repository/messageRepository';
+import { userRepository, sha256 } from '../repository/userRepository';
 import { db } from '../database/DatabaseConnection';
 import type { Produto } from '../database/DatabaseConnection';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -61,9 +62,11 @@ export function CaixaPDV() {
   ) || [];
   const mensagensNaoLidas = mensagensLivres.filter(m => !m.lida);
   const [mensagensModalOpen, setMensagensModalOpen] = useState(false);
-  
-  // Caixa
+  const [saleError, setSaleError] = useState('');
+
+  // Estados de Abertura de Caixa
   const [openingBalance, setOpeningBalance] = useState<string>('');
+  const [adminPin, setAdminPin] = useState('');
   
   // Pagamento & Troco
   const [cashPaid, setCashPaid] = useState<string>('');
@@ -182,12 +185,30 @@ export function CaixaPDV() {
       return;
     }
 
+    if (!adminPin) {
+      setError('A assinatura (PIN) do Gerente é obrigatória para abrir o caixa!');
+      return;
+    }
+
     if (!user) return;
 
     try {
+      const pinHash = await sha256(adminPin);
+      const allUsers = await userRepository.getAllUsers();
+      const adminAuth = allUsers.find(u => 
+        (u.nivel_acesso === 'SUPER_ADMIN' || u.nivel_acesso === 'ADMIN_OPERACIONAL') && 
+        u.pin_acesso === pinHash
+      );
+
+      if (!adminAuth) {
+        setError('PIN inválido ou usuário sem permissão de Gerência!');
+        return;
+      }
+
       await saleRepository.openCaixa(user.email, parsedBalance);
       await loadInitialData();
       setOpeningBalance('');
+      setAdminPin('');
     } catch (err: any) {
       setError(err.message || 'Erro ao abrir caixa.');
     }
@@ -733,6 +754,27 @@ export function CaixaPDV() {
                       autoFocus
                     />
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
+                    Assinatura do Gerente (PIN)
+                    <span className="text-[10px] bg-rose-500/10 text-rose-400 px-2 py-0.5 rounded border border-rose-500/20 uppercase tracking-wider font-black">Obrigatório</span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-3.5 text-slate-500"><Key size={18} /></span>
+                    <input
+                      type="password"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={6}
+                      placeholder="••••••"
+                      value={adminPin}
+                      onChange={(e) => setAdminPin(e.target.value.replace(/\D/g, ''))}
+                      className="w-full rounded-xl border border-slate-800 bg-slate-900 pl-11 pr-4 py-3 text-xl tracking-widest font-bold text-white placeholder-slate-600 focus:border-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-400/20"
+                    />
+                  </div>
+                  <p className="text-xs text-slate-500 mt-2 text-center font-medium">Requer autorização de um Admin ou Gerente.</p>
                 </div>
 
                 {error && (
