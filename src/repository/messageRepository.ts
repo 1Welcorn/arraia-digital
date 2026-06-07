@@ -47,6 +47,8 @@ export const messageRepository = {
     if (msg) {
       msg.lida = true;
       await db.mensagens.put(msg);
+      // Envia o "recibo de leitura" para a nuvem para que a sincronização não devolva como "não lida"
+      apiClient.post('/sync/messages', msg).catch(console.error);
     }
   },
   
