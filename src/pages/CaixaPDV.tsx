@@ -961,7 +961,7 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
               )}
 
               {/* LISTA DE PRODUTOS */}
-              <div className="flex-1 overflow-y-auto pr-1 pb-64 lg:pb-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 align-content-start">
+              <div className="flex-1 overflow-y-auto pr-1 pb-64 lg:pb-6 flex flex-col sm:grid sm:grid-cols-2 xl:grid-cols-4 gap-3 content-start">
                 {sortedProducts.map((product) => {
                   const inCartQty = cart.find((item) => item.product.id === product.id)?.quantity || 0;
                   return (
