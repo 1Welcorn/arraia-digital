@@ -111,31 +111,47 @@ export function SuperDashboard() {
   };
 
   const handleDeleteUser = async (email: string) => {
-    if (email === currentUser?.email) {
-      alert('Você não pode apagar o seu próprio usuário, sô!');
+    if (!window.confirm(`Tem certeza que deseja remover ${email}?`)) return;
+    
+    // 1. Apaga na nuvem primeiro
+    try {
+      await apiClient.delete(`/sync/users/${email}`);
+    } catch (cloudErr) {
+      console.warn('Erro ao apagar na nuvem, ou usuário já não existia lá:', cloudErr);
+    }
+    
+    // 2. Apaga localmente
+    await db.usuarios_sistema.delete(email);
+    
+    // 3. Força sincronização
+    syncEngine.syncNow().catch(() => {});
+    
+    loadUsers();
+    setSuccess(`Usuário ${email} removido com sucesso.`);
+    setTimeout(() => setSuccess(''), 4000);
+  };
+
+  const handleResetPin = async (email: string) => {
+    const newPin = window.prompt(`Digite o NOVO PIN de 4 a 6 números para ${email}:`);
+    if (!newPin) return; // cancelou
+    
+    if (newPin.length < 4 || isNaN(Number(newPin))) {
+      alert('O PIN deve conter pelo menos 4 números e apenas números!');
       return;
     }
-    if (!window.confirm(`Tem certeza que deseja remover ${email} da Whitelist?`)) return;
 
     try {
-      // 1. Apaga na nuvem primeiro
-      try {
-        await apiClient.delete(`/sync/users/${email}`);
-      } catch (cloudErr) {
-        console.warn('Erro ao apagar na nuvem, ou usuário já não existia lá:', cloudErr);
-      }
-
-      // 2. Apaga localmente
-      await userRepository.deleteUser(email);
-      setSuccess('Usuário removido da Whitelist e da Nuvem.');
-      await loadUsers();
+      const pinHash = await sha256(newPin);
+      await db.usuarios_sistema.update(email, { pin_acesso: pinHash });
       
-      // Tenta sincronizar o restante
+      // Força a sincronização para jogar o novo PIN na nuvem (que usará o Upsert do nosso backend)
       syncEngine.syncNow().catch(() => {});
-
+      
+      setSuccess(`PIN de ${email} alterado com sucesso!`);
       setTimeout(() => setSuccess(''), 4000);
     } catch (err) {
-      setError('Erro ao remover usuário.');
+      console.error(err);
+      alert('Erro ao redefinir PIN.');
     }
   };
 
@@ -431,7 +447,7 @@ export function SuperDashboard() {
                     <th className="px-6 py-3">Nome</th>
                     <th className="px-6 py-3">E-mail Institucional</th>
                     <th className="px-6 py-3">Permissão</th>
-                    <th className="px-6 py-3 text-center">Remover</th>
+                    <th className="px-6 py-3 text-center">Ações</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/50">
@@ -451,16 +467,24 @@ export function SuperDashboard() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-center">
-                        {u.nivel_acesso !== 'SUPER_ADMIN' ? (
+                        <div className="flex items-center justify-center gap-2">
                           <button
-                            onClick={() => handleDeleteUser(u.email)}
-                            className="p-1.5 rounded-lg bg-red-950/35 hover:bg-red-950/70 border border-red-900/30 text-rose-400 hover:text-white transition-colors cursor-pointer"
+                            onClick={() => handleResetPin(u.email)}
+                            title="Redefinir PIN"
+                            className="p-1.5 rounded-lg bg-indigo-950/35 hover:bg-indigo-950/70 border border-indigo-900/30 text-indigo-400 hover:text-white transition-colors cursor-pointer"
                           >
-                            <Trash2 size={14} />
+                            <Key size={14} />
                           </button>
-                        ) : (
-                          <span className="text-xs text-slate-600 font-bold">-</span>
-                        )}
+                          {u.nivel_acesso !== 'SUPER_ADMIN' && (
+                            <button
+                              onClick={() => handleDeleteUser(u.email)}
+                              title="Remover Usuário"
+                              className="p-1.5 rounded-lg bg-red-950/35 hover:bg-red-950/70 border border-red-900/30 text-rose-400 hover:text-white transition-colors cursor-pointer"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
