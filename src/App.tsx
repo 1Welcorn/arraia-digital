@@ -4,7 +4,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 function App() {
   return (
     <ErrorBoundary>
-      <div className="w-screen h-screen overflow-hidden select-none">
+      <div className="w-screen h-[100dvh] overflow-hidden select-none">
         <AppRoutes />
       </div>
     </ErrorBoundary>
