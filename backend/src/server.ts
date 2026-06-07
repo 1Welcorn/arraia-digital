@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import pg from 'pg';
 import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
@@ -7,27 +8,37 @@ import fs from 'fs';
 import path from 'path';
 
 dotenv.config();
+const { Client } = pg;
 
 const app = express();
+
 let prisma: any;
-let prismaError: string = "";
 try {
   prisma = new PrismaClient();
 } catch (e: any) {
-  prismaError = e.message || String(e);
+  console.error("Prisma failed to init:", e);
 }
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-app.get('/api/health', (req, res) => {
+app.get('/api/health', async (req, res) => {
+  let dbStatus = "Unknown";
+  try {
+    const client = new Client({ connectionString: process.env.DATABASE_URL });
+    await client.connect();
+    await client.end();
+    dbStatus = "Connected OK";
+  } catch(e: any) {
+    dbStatus = e.message || String(e);
+  }
+
   res.json({ 
     status: 'ok', 
-    hasPrisma: !!prisma, 
-    prismaError,
     dbUrl: process.env.DATABASE_URL ? "SET" : "MISSING", 
     directUrl: process.env.DIRECT_URL ? "SET" : "MISSING",
+    dbConnection: dbStatus,
     cwd: process.cwd(),
     dirname: __dirname
   });
@@ -39,6 +50,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'arraia-secreto-super-seguro';
 // ROTA DE AUTENTICAÇÃO
 // ==========================================
 app.post('/api/auth/login', async (req, res) => {
+  const client = new Client({ connectionString: process.env.DATABASE_URL });
   try {
     const { email, pin_acesso } = req.body;
 
@@ -46,9 +58,9 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(400).json({ error: 'Email e PIN são obrigatórios' });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email }
-    });
+    await client.connect();
+    const result = await client.query('SELECT * FROM "User" WHERE email = $1', [email]);
+    const user = result.rows[0];
 
     if (!user || user.pin_acesso !== pin_acesso) {
       return res.status(401).json({ error: 'Credenciais inválidas' });
