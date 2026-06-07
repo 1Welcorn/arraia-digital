@@ -96,31 +96,42 @@ app.post('/api/auth/login', async (req, res) => {
 
 // ==========================================
 // CONFIGURAÇÕES GLOBAIS (PIX)
-// ==========================================
-const SETTINGS_FILE = path.join(__dirname, '..', 'settings.json');
+// Leitura e gravação de configurações Globais (via banco)
+const DEFAULT_PIX = { key: '12345678000199', name: 'APMF ESCOLA ESTADUAL', city: 'CURITIBA' };
 
-const getSettings = () => {
-  if (fs.existsSync(SETTINGS_FILE)) {
-    try {
-      return JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf-8'));
-    } catch(e) { }
+app.get('/api/settings/pix', async (req, res) => {
+  try {
+    const setting = await prisma.systemSetting.findUnique({ where: { key: 'global_pix' } });
+    if (setting) {
+      res.json(JSON.parse(setting.value));
+    } else {
+      res.json(DEFAULT_PIX);
+    }
+  } catch(e) {
+    res.json(DEFAULT_PIX);
   }
-  return { pix: { key: '12345678000199', name: 'APMF ESCOLA ESTADUAL', city: 'CURITIBA' } };
-};
-
-const saveSettings = (data: any) => {
-  fs.writeFileSync(SETTINGS_FILE, JSON.stringify(data, null, 2));
-};
-
-app.get('/api/settings/pix', (req, res) => {
-  res.json(getSettings().pix);
 });
 
-app.post('/api/settings/pix', (req, res) => {
-  const settings = getSettings();
-  settings.pix = { ...settings.pix, ...req.body };
-  saveSettings(settings);
-  res.json({ success: true, config: settings.pix });
+app.post('/api/settings/pix', async (req, res) => {
+  try {
+    const setting = await prisma.systemSetting.findUnique({ where: { key: 'global_pix' } });
+    let currentPix = DEFAULT_PIX;
+    if (setting) {
+      currentPix = JSON.parse(setting.value);
+    }
+    
+    const newPix = { ...currentPix, ...req.body };
+    
+    await prisma.systemSetting.upsert({
+      where: { key: 'global_pix' },
+      update: { value: JSON.stringify(newPix) },
+      create: { key: 'global_pix', value: JSON.stringify(newPix) }
+    });
+    
+    res.json({ success: true, config: newPix });
+  } catch(e: any) {
+    res.status(500).json({ success: false, error: e.message });
+  }
 });
 
 // ==========================================

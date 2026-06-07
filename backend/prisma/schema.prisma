@@ -5,6 +5,7 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -77,4 +78,9 @@ model Message {
   timestamp         Float
   
   lida              Boolean  @default(false)
+}
+
+model SystemSetting {
+  key   String @id
+  value String
 }
