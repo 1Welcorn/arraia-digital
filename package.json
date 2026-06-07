@@ -11,7 +11,7 @@
     "postinstall": "npx prisma generate --schema=backend/prisma/schema.prisma"
   },
   "dependencies": {
-    "@prisma/client": "^7.8.0",
+    "@prisma/client": "^5.13.0",
     "@tailwindcss/vite": "^4.3.0",
     "axios": "^1.17.0",
     "cors": "^2.8.6",

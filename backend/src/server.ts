@@ -3,8 +3,7 @@ import cors from 'cors';
 // @ts-ignore
 import pg from 'pg';
 import dotenv from 'dotenv';
-// @ts-ignore
-const { PrismaClient } = require('./generated/client');
+import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
 import path from 'path';
