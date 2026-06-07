@@ -86,7 +86,7 @@ export function AdminDashboard() {
       cor_ficha = 'bg-blue-600 text-white border-blue-400';
       imagem = '/images/bebida.png';
     } else if (novoProdutoCategoria === 'DOCES') {
-      cor_ficha = 'bg-orange-200 text-amber-950 border-amber-200';
+      cor_ficha = 'bg-rose-600 text-white border-rose-400';
       imagem = '/images/doce.png';
     } else if (novoProdutoCategoria === 'JOGOS') {
       cor_ficha = 'bg-purple-600 text-white border-purple-400';
