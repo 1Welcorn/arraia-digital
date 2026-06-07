@@ -764,8 +764,8 @@ export function CaixaPDV() {
             <div className="flex-1 flex flex-col p-4 md:p-6 pb-44 lg:pb-6 overflow-hidden relative">
               
               {/* FILTROS E ORDENAÇÃO */}
-              <div className="flex items-center justify-between gap-4 mb-4 bg-slate-950/30 p-2.5 rounded-2xl border border-slate-800/60 overflow-x-auto pb-2 scrollbar-none">
-                <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between gap-4 mb-4 bg-slate-950/30 p-2.5 rounded-2xl border border-slate-800/60 pb-2">
+                <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1 flex-1">
                   {(['tudo', 'comida', 'bebida', 'doce', 'jogo'] as const).map((tab) => (
                     <button
                       key={tab}
@@ -782,7 +782,7 @@ export function CaixaPDV() {
                 </div>
 
                 {/* MENU ADMINISTRATIVO DO CAIXA (Substitui o Ordenar Por) */}
-                <div className="relative z-30 flex items-center border-l border-slate-850 pl-4">
+                <div className="relative z-50 flex items-center border-l border-slate-850 pl-4 flex-shrink-0">
                   <button
                     onClick={() => setIsTopAdminMenuOpen(!isTopAdminMenuOpen)}
                     className="flex items-center gap-2 bg-slate-900 border border-slate-800 text-slate-300 px-3 py-2 rounded-xl text-xs font-bold hover:bg-slate-800 hover:text-white transition-colors cursor-pointer"
