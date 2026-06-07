@@ -12,7 +12,6 @@ import {
   User
 } from 'lucide-react';
 import { authLocalService } from '../services/authLocalService';
-import type { UserSession } from '../services/authLocalService';
 import { userRepository, sha256 } from '../repository/userRepository';
 import { db } from '../database/DatabaseConnection';
 import { apiClient } from '../services/apiClient';
@@ -21,7 +20,6 @@ import { syncEngine } from '../services/syncEngine';
 
 export function SuperDashboard() {
   const navigate = useNavigate();
-  const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
   
   // Whitelist users
   const [users, setUsers] = useState<UsuarioSistema[]>([]);
@@ -42,12 +40,10 @@ export function SuperDashboard() {
   useEffect(() => {
     // Apenas super_admins podem acessar
     const user = authLocalService.getCurrentUser();
-    if (!user || user.role !== 'SUPER_ADMIN') {
-      navigate('/pdv');
+    if (!user || user.nivel_acesso !== 'SUPER_ADMIN') {
+      navigate('/login');
       return;
     }
-    setCurrentUser(user);
-
     loadUsers();
   }, [navigate]);
 
