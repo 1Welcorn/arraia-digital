@@ -652,12 +652,12 @@ export function CaixaPDV() {
     <div className="flex flex-col h-full w-full bg-slate-900 text-white select-none">
       
       {/* HEADER DO OPERADOR */}
-      <header className="flex items-center justify-between border-b border-slate-800 bg-slate-950 px-3 md:px-6 py-3 md:py-4 shadow-md gap-2">
-        <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
-          <span className="text-2xl md:text-3xl">🔥</span>
+      <header className="flex items-center justify-between border-b border-slate-800 bg-slate-950 px-2 md:px-6 py-1.5 md:py-4 shadow-md gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 md:gap-3 flex-shrink-0">
+          <span className="text-xl md:text-3xl">🔥</span>
           <div className="hidden sm:block">
-            <h1 className="text-lg md:text-xl font-bold tracking-tight text-amber-500 leading-tight">Arraiá Digital</h1>
-            <p className="text-[10px] md:text-xs text-slate-400 leading-tight">Escola Ativa • Frente de Caixa</p>
+            <h1 className="text-base md:text-xl font-bold tracking-tight text-amber-500 leading-tight">Arraiá Digital</h1>
+            <p className="text-[9px] md:text-xs text-slate-400 leading-tight">Escola Ativa • Frente de Caixa</p>
           </div>
         </div>
 
