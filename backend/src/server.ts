@@ -225,8 +225,8 @@ app.get('/api/sync/sessions', authenticateToken, async (req, res) => {
   try {
     const sessions = await prisma.caixaSession.findMany();
     res.json(sessions);
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar sessões de caixa' });
+  } catch (error: any) {
+    res.status(500).json({ error: 'Erro ao buscar sessões de caixa', details: error.message });
   }
 });
 
