@@ -97,7 +97,7 @@ export function AdminDashboard() {
       id: Date.now().toString(),
       nome: novoProdutoNome,
       preco: parseFloat(novoProdutoPreco.replace(',', '.')),
-      categoria: novoProdutoCategoria,
+      categoria: novoProdutoCategoria as 'COMIDAS' | 'BEBIDAS' | 'DOCES' | 'JOGOS',
       cor_ficha,
       ativo: 1,
       imagem
