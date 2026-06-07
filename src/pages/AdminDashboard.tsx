@@ -24,9 +24,10 @@ import { saleRepository } from '../repository/saleRepository';
 import type { LocalCaixaSession } from '../repository/saleRepository';
 import { messageRepository } from '../repository/messageRepository';
 import { db } from '../database/DatabaseConnection';
-import type { Produto, Venda, ItemVenda } from '../database/DatabaseConnection';
+import type { Produto, Venda, ItemVenda, Mensagem } from '../database/DatabaseConnection';
 import { syncEngine } from '../services/syncEngine';
 import { apiClient } from '../services/apiClient';
+import { useLiveQuery } from 'dexie-react-hooks';
 
 export function AdminDashboard() {
   const navigate = useNavigate();
@@ -59,6 +60,10 @@ export function AdminDashboard() {
   // Messages state
   const [msgDestinatario, setMsgDestinatario] = useState<string>('GERAL');
   const [msgConteudo, setMsgConteudo] = useState<string>('');
+  const mensagensHistorico = useLiveQuery(
+    () => db.mensagens.reverse().sortBy('timestamp'),
+    []
+  ) || [];
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -901,6 +906,42 @@ export function AdminDashboard() {
                     <Send size={18} /> Enviar Mensagem
                   </button>
                 </form>
+              </div>
+
+              {/* HISTÓRICO DE MENSAGENS ENVIADAS */}
+              <div className="mt-8 bg-slate-950 p-6 md:p-8 rounded-3xl border border-slate-800 shadow-xl max-w-2xl">
+                <h3 className="text-xl font-black text-white mb-6 flex items-center gap-2">
+                  <MessageSquare size={20} className="text-indigo-500" /> Histórico de Avisos
+                </h3>
+                
+                <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+                  {mensagensHistorico.length === 0 ? (
+                    <div className="text-center text-slate-500 py-8 italic">
+                      Nenhum aviso enviado ou recebido ainda.
+                    </div>
+                  ) : (
+                    mensagensHistorico.map(msg => (
+                      <div key={msg.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <span className={`text-[10px] px-2 py-0.5 rounded-md font-black uppercase tracking-wider ${
+                            msg.tipo === 'GERAL' ? 'bg-amber-500/20 text-amber-500' : 'bg-indigo-500/20 text-indigo-400'
+                          }`}>
+                            {msg.tipo === 'GERAL' ? 'Aviso Geral' : `Para: ${msg.destinatarioEmail}`}
+                          </span>
+                          <span className="text-[10px] text-slate-500">
+                            {new Date(msg.timestamp).toLocaleString('pt-BR')}
+                          </span>
+                        </div>
+                        <p className="text-slate-300 text-sm leading-relaxed">{msg.conteudo}</p>
+                        <div className="mt-2 text-right">
+                          <span className={`text-[10px] font-bold ${msg.lida ? 'text-emerald-500' : 'text-slate-500'}`}>
+                            {msg.lida ? '✓ Mensagem lida' : 'Lida por: Ninguém'}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
 
               {/* ZONA DE PERIGO (RESET) */}
