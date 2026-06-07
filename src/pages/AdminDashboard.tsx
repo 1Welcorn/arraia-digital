@@ -582,11 +582,11 @@ export function AdminDashboard() {
                               <span className="text-purple-400 block font-semibold">💳 Car: R$ {(session.vendasCartao || 0).toFixed(2)}</span>
                             </td>
                             <td className="px-6 py-4">
-                              {session.valorFechamento !== undefined ? (
+                              {session.valorFechamento != null ? (
                                 <div className="space-y-0.5 font-mono">
                                   <span className="block font-semibold">Contado: R$ {session.valorFechamento.toFixed(2)}</span>
                                   <span className="block text-[10px] text-slate-500">Estimado: R$ {est.toFixed(2)}</span>
-                                  {session.diferenca !== undefined && (
+                                  {session.diferenca != null && (
                                     <span className={`block text-[10px] font-bold ${
                                       session.diferenca === 0 
                                         ? 'text-emerald-400' 
@@ -736,7 +736,7 @@ export function AdminDashboard() {
                               </td>
                               <td className="px-6 py-4">
                                 <span className="font-bold text-white">R$ {sale.valor_total.toFixed(2)}</span>
-                                {sale.valor_pago !== undefined && sale.valor_pago > sale.valor_total && (
+                                {sale.valor_pago != null && sale.valor_pago > sale.valor_total && (
                                   <span className="block text-[10px] text-slate-400 mt-0.5 leading-tight">
                                     Pago: R$ {sale.valor_pago.toFixed(2)}<br/>
                                     Troco: R$ {sale.troco?.toFixed(2)}
