@@ -190,6 +190,20 @@ app.post('/api/sync/messages', authenticateToken, async (req: any, res) => {
   }
 });
 
+// Resetar banco
+app.post('/api/sync/reset', authenticateToken, async (req, res) => {
+  try {
+    // Apaga todas as vendas e sessões
+    await prisma.$executeRaw`DELETE FROM "SaleItem"`;
+    await prisma.$executeRaw`DELETE FROM "Sale"`;
+    await prisma.$executeRaw`DELETE FROM "CaixaSession"`;
+    
+    res.json({ message: 'Banco de dados resetado com sucesso!' });
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao resetar banco' });
+  }
+});
+
 // Puxar produtos mais recentes
 app.get('/api/sync/products', authenticateToken, async (req, res) => {
   try {
@@ -356,44 +370,36 @@ app.post('/api/sync/sales', authenticateToken, async (req, res) => {
   }
 });
 
-// Sincronizar sessões de caixa
+// Sincronizar sessões (Upload do Caixa)
 app.post('/api/sync/sessions', authenticateToken, async (req, res) => {
   try {
     const sessions = req.body; // Array
     if (!Array.isArray(sessions)) return res.status(400).json({ error: 'Body deve ser um array' });
 
     for (const s of sessions) {
-      // Upsert: cria ou atualiza se já existe (ex: abriu o caixa, depois fechou)
-      await prisma.caixaSession.upsert({
-        where: { id: s.id },
-        update: {
-          status: s.status,
-          valorFechamento: s.valorFechamento,
-          timestampFechamento: s.timestampFechamento,
-          observacoes: s.observacoes,
-          sangriasJson: JSON.stringify(s.sangrias || []),
-          suprimentosJson: JSON.stringify(s.suprimentos || []),
-          synced_at: new Date()
-        },
-        create: {
-          id: s.id,
-          operadorEmail: s.operadorEmail,
-          status: s.status,
-          valorAbertura: s.valorAbertura,
-          valorFechamento: s.valorFechamento,
-          timestampAbertura: s.timestampAbertura,
-          timestampFechamento: s.timestampFechamento,
-          observacoes: s.observacoes,
-          sangriasJson: JSON.stringify(s.sangrias || []),
-          suprimentosJson: JSON.stringify(s.suprimentos || [])
-        }
-      });
+      // Usar $executeRaw para fazer o upsert
+      await prisma.$executeRaw`
+        INSERT INTO "CaixaSession" (
+          id, "operadorEmail", status, "valorAbertura", "valorFechamento",
+          "timestampAbertura", "timestampFechamento", observacoes, "sangriasJson", "suprimentosJson"
+        ) VALUES (
+          ${s.id}, ${s.operadorEmail}, ${s.status}, ${s.valorAbertura}, ${s.valorFechamento || null},
+          ${s.timestampAbertura}, ${s.timestampFechamento || null}, ${s.observacoes || ''}, ${JSON.stringify(s.sangrias || [])}, ${JSON.stringify(s.suprimentos || [])}
+        )
+        ON CONFLICT (id) DO UPDATE SET
+          status = EXCLUDED.status,
+          "valorFechamento" = EXCLUDED."valorFechamento",
+          "timestampFechamento" = EXCLUDED."timestampFechamento",
+          observacoes = EXCLUDED.observacoes,
+          "sangriasJson" = EXCLUDED."sangriasJson",
+          "suprimentosJson" = EXCLUDED."suprimentosJson",
+          synced_at = NOW()
+      `;
     }
 
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Erro no sync de sessoes:', error);
-    res.status(500).json({ error: 'Erro ao sincronizar sessoes' });
+    res.json({ success: true, count: sessions.length });
+  } catch (error: any) {
+    res.status(500).json({ error: 'Erro ao sincronizar sessões', details: error.message });
   }
 });
 
