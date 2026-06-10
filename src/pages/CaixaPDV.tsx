@@ -1811,6 +1811,29 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
                 ))
               )}
             </div>
+
+            {/* CAIXA DE MENSAGEM PARA ADMIN */}
+            <div className="p-4 border-t border-slate-800 bg-slate-950">
+              <form onSubmit={handleSendMessageToAdmin} className="flex flex-col gap-3">
+                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Mandar recado para a coordenação</label>
+                <div className="flex gap-2">
+                  <input 
+                    type="text" 
+                    value={novaMensagemAdmin}
+                    onChange={e => setNovaMensagemAdmin(e.target.value)}
+                    placeholder="Preciso de troco, etc..." 
+                    className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none"
+                    required
+                  />
+                  <button 
+                    type="submit"
+                    className="bg-amber-500 hover:bg-amber-400 text-slate-950 px-4 rounded-xl font-bold transition-all flex items-center justify-center shadow-lg shadow-amber-500/20 cursor-pointer shrink-0"
+                  >
+                    <Send size={18} />
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
