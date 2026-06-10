@@ -229,13 +229,17 @@ app.get('/api/sync/products', authenticateToken, async (req, res) => {
 app.get('/api/sync/messages', authenticateToken, async (req: any, res) => {
   try {
     const email = req.query.email || req.user.email;
+    const isAdmin = req.user.role === 'SUPER_ADMIN' || req.user.role === 'ADMIN_OPERACIONAL';
+    
+    const whereClause = isAdmin ? {} : {
+      OR: [
+        { tipo: 'GERAL' },
+        { destinatarioEmail: email }
+      ]
+    };
+
     const messages = await prisma.message.findMany({
-      where: {
-        OR: [
-          { tipo: 'GERAL' },
-          { destinatarioEmail: email }
-        ]
-      },
+      where: whereClause,
       orderBy: { timestamp: 'desc' },
       take: 50 // Limitando às ultimas 50
     });

@@ -981,9 +981,13 @@ export function AdminDashboard() {
                       <div key={msg.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
                         <div className="flex justify-between items-start mb-2">
                           <span className={`text-[10px] px-2 py-0.5 rounded-md font-black uppercase tracking-wider ${
-                            msg.tipo === 'GERAL' ? 'bg-amber-500/20 text-amber-500' : 'bg-indigo-500/20 text-indigo-400'
+                            msg.tipo === 'GERAL' ? 'bg-amber-500/20 text-amber-500' : 
+                            msg.destinatarioEmail === 'ADMIN' ? 'bg-emerald-500/20 text-emerald-400' :
+                            'bg-indigo-500/20 text-indigo-400'
                           }`}>
-                            {msg.tipo === 'GERAL' ? 'Aviso Geral' : `Para: ${msg.destinatarioEmail}`}
+                            {msg.tipo === 'GERAL' ? 'Aviso Geral' : 
+                             msg.destinatarioEmail === 'ADMIN' ? `De: ${msg.remetente}` :
+                             `Para: ${msg.destinatarioEmail}`}
                           </span>
                           <span className="text-[10px] text-slate-500">
                             {new Date(msg.timestamp).toLocaleString('pt-BR')}

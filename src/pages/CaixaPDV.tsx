@@ -24,7 +24,8 @@ import {
   X,
   ChevronDown,
   Lock,
-  Key
+  Key,
+  Send
 } from 'lucide-react';
 import { authLocalService } from '../services/authLocalService';
 import type { UserSession } from '../services/authLocalService';
@@ -63,6 +64,25 @@ export function CaixaPDV() {
   ) || [];
   const mensagensNaoLidas = mensagensLivres.filter(m => !m.lida);
   const [mensagensModalOpen, setMensagensModalOpen] = useState(false);
+  const [novaMensagemAdmin, setNovaMensagemAdmin] = useState('');
+  
+  const handleSendMessageToAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!novaMensagemAdmin.trim()) return;
+    try {
+      await messageRepository.enviarMensagemIndividual(
+        user?.nome || 'Operador de Caixa', 
+        'ADMIN', 
+        novaMensagemAdmin
+      );
+      setNovaMensagemAdmin('');
+      alert('Mensagem enviada com sucesso para a coordenação!');
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao enviar mensagem.');
+    }
+  };
+
   // Estados de Abertura de Caixa
   const [openingBalance, setOpeningBalance] = useState<string>('');
   const [adminPin, setAdminPin] = useState('');
