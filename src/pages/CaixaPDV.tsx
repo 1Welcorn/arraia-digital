@@ -1188,9 +1188,18 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
                   <ShoppingCart className="text-amber-500" size={20} />
                   <span className="font-extrabold text-lg">Comandas / Sacola</span>
                 </div>
-                <span className="bg-slate-900 border border-slate-800 text-slate-400 px-2.5 py-0.5 rounded-lg text-xs font-bold">
-                  {cart.reduce((a, b) => a + b.quantity, 0)} itens
-                </span>
+                <div className="flex items-center gap-3">
+                  <button onClick={() => {
+                    setFichasDevolvidas([]);
+                    setFichasNovas([]);
+                    setTrocaFichasModalOpen(true);
+                  }} className="flex items-center gap-1.5 bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/30 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer border border-indigo-500/30">
+                    <RefreshCw size={14} /> Trocar Fichas
+                  </button>
+                  <span className="bg-slate-900 border border-slate-800 text-slate-400 px-2.5 py-0.5 rounded-lg text-xs font-bold">
+                    {cart.reduce((a, b) => a + b.quantity, 0)} itens
+                  </span>
+                </div>
               </div>
 
               {/* LISTAGEM DE ITENS */}
@@ -1335,10 +1344,15 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
               <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-md border-t border-slate-800 p-4 pb-6 flex flex-col gap-3 z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
                 
                 <div className="flex items-center justify-between mb-1">
-                  <button onClick={() => setIsCartOpenMobile(true)} className="flex items-center gap-2 text-amber-500 font-bold active:scale-95 bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/20">
-                    <ShoppingCart size={18} />
-                    <span>Sacola ({cart.reduce((a, b) => a + b.quantity, 0)})</span>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => setIsCartOpenMobile(true)} className="flex items-center gap-2 text-amber-500 font-bold active:scale-95 bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/20">
+                      <ShoppingCart size={18} />
+                      <span>Sacola ({cart.reduce((a, b) => a + b.quantity, 0)})</span>
+                    </button>
+                    <button onClick={() => { setFichasDevolvidas([]); setFichasNovas([]); setTrocaFichasModalOpen(true); }} className="flex items-center gap-1.5 text-indigo-400 font-bold active:scale-95 bg-indigo-500/10 px-3 py-1.5 rounded-lg border border-indigo-500/20 text-xs">
+                      <RefreshCw size={14} /> Trocar Fichas
+                    </button>
+                  </div>
                   <span className="text-3xl font-black text-amber-500 tracking-tight">R$ {cartTotal.toFixed(2)}</span>
                 </div>
 
