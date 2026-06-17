@@ -26,7 +26,7 @@ export const productRepository = {
         { id: 'prod_2', nome: 'CACHORRO QUENTE', preco: 10.00, categoria: 'COMIDAS', cor_ficha: 'bg-amber-500 text-slate-900 border-amber-400', ativo: 1, imagem: '/images/cachorro-quente.png' },
         { id: 'prod_3', nome: 'PIPOCA', preco: 3.00, categoria: 'COMIDAS', cor_ficha: 'bg-amber-500 text-slate-900 border-amber-400', ativo: 1, imagem: '/images/pipoca.png' },
         { id: 'prod_4', nome: 'ESPETINHO', preco: 10.00, categoria: 'COMIDAS', cor_ficha: 'bg-amber-500 text-slate-900 border-amber-400', ativo: 1, imagem: '/images/espetinho.png' },
-        { id: 'prod_5', nome: 'MILHO VERDE COZIDO', preco: 10.00, categoria: 'COMIDAS', cor_ficha: 'bg-amber-500 text-slate-900 border-amber-400', ativo: 1, imagem: '/images/milho-verde.png' },
+        { id: 'prod_5', nome: 'MILHO VERDE COZIDO', preco: 10.00, categoria: 'COMIDAS', cor_ficha: 'bg-amber-500 text-slate-900 border-amber-400', ativo: 1, imagem: '/images/milho-verde-cozido.png' },
         
         // Doces
         { id: 'prod_6', nome: 'CANJICA', preco: 7.00, categoria: 'DOCES', cor_ficha: 'bg-rose-600 text-white border-rose-400', ativo: 1, imagem: '/images/canjica.png' },
@@ -49,7 +49,7 @@ export const productRepository = {
         { id: 'prod_19', nome: 'BOCA DO CAIPIRA', preco: 6.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/boca-do-caipira.png' },
         { id: 'prod_20', nome: 'COTONETE', preco: 6.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/cotonete.png' },
         { id: 'prod_21', nome: 'TOURO MECÂNICO', preco: 10.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/touro-mecanico.png' },
-        { id: 'prod_22', nome: 'PINTURA ARTÍSTICA', preco: 5.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/jogo.png' },
+        { id: 'prod_22', nome: 'PINTURA ARTÍSTICA', preco: 5.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/pintura-artistica.png' },
       ];
 
       await db.produtos.bulkAdd(defaultProducts);
