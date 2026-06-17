@@ -64,6 +64,21 @@ export const userRepository = {
       });
       console.log(`Usuário ${williansEmail} adicionado com sucesso!`);
     }
+
+    // Garante que o Vinicius esteja na whitelist
+    const viniciusEmail = 'vinicius.reis@escola.pr.gov.br';
+    const hasVinicius = await db.usuarios_sistema.get(viniciusEmail);
+    if (!hasVinicius) {
+      const viniciusPin = await sha256('123456');
+      await db.usuarios_sistema.put({
+        email: viniciusEmail,
+        nome: 'Vinicius Reis - Vendedor',
+        pin_acesso: viniciusPin,
+        nivel_acesso: 'OPERADOR_CAIXA',
+        ativo: 1,
+      });
+      console.log(`Usuário ${viniciusEmail} adicionado com sucesso!`);
+    }
   },
 
   async findByEmail(email: string): Promise<UsuarioSistema | undefined> {
