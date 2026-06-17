@@ -2231,7 +2231,7 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
               <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
                 <h4 className="font-bold text-rose-400 mb-4 border-b border-slate-800 pb-2">1. Fichas Devolvidas (Cliente devolve)</h4>
                 <div className="max-h-60 overflow-y-auto space-y-2 pr-2">
-                  {products.filter(p => p.ativo === 1 && !p.nome.toUpperCase().includes('KIT FICHAS')).map(product => {
+                  {products.filter(p => p.ativo === 1 && !p.nome.toUpperCase().includes('KIT FICHAS')).sort((a, b) => a.nome.localeCompare(b.nome)).map(product => {
                     const found = fichasDevolvidas.find(i => i.product.id === product.id);
                     const qty = found ? found.quantity : 0;
                     return (
@@ -2260,7 +2260,7 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
               <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
                 <h4 className="font-bold text-emerald-400 mb-4 border-b border-slate-800 pb-2">2. Novas Fichas (Cliente leva)</h4>
                 <div className="max-h-60 overflow-y-auto space-y-2 pr-2">
-                  {products.filter(p => p.ativo === 1 && !p.nome.toUpperCase().includes('KIT FICHAS')).map(product => {
+                  {products.filter(p => p.ativo === 1 && !p.nome.toUpperCase().includes('KIT FICHAS')).sort((a, b) => a.nome.localeCompare(b.nome)).map(product => {
                     const found = fichasNovas.find(i => i.product.id === product.id);
                     const qty = found ? found.quantity : 0;
                     return (
