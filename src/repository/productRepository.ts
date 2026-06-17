@@ -23,7 +23,7 @@ export const productRepository = {
       const defaultProducts: Produto[] = [
         // Comidas
         { id: 'prod_1', nome: 'PASTEL', preco: 10.00, categoria: 'COMIDAS', cor_ficha: 'bg-amber-500 text-slate-900 border-amber-400', ativo: 1, imagem: '/images/pastel.png' },
-        { id: 'prod_2', nome: 'CACHORRO QUENTE', preco: 10.00, categoria: 'COMIDAS', cor_ficha: 'bg-amber-500 text-slate-900 border-amber-400', ativo: 1, imagem: '/images/cachorro quente.png' },
+        { id: 'prod_2', nome: 'CACHORRO QUENTE', preco: 10.00, categoria: 'COMIDAS', cor_ficha: 'bg-amber-500 text-slate-900 border-amber-400', ativo: 1, imagem: '/images/cachorro-quente.png' },
         { id: 'prod_3', nome: 'PIPOCA', preco: 3.00, categoria: 'COMIDAS', cor_ficha: 'bg-amber-500 text-slate-900 border-amber-400', ativo: 1, imagem: '/images/pipoca.png' },
         { id: 'prod_4', nome: 'ESPETINHO', preco: 10.00, categoria: 'COMIDAS', cor_ficha: 'bg-amber-500 text-slate-900 border-amber-400', ativo: 1, imagem: '/images/comida.png' },
         { id: 'prod_5', nome: 'MILHO VERDE COZIDO', preco: 10.00, categoria: 'COMIDAS', cor_ficha: 'bg-amber-500 text-slate-900 border-amber-400', ativo: 1, imagem: '/images/comida.png' },
@@ -31,24 +31,24 @@ export const productRepository = {
         // Doces
         { id: 'prod_6', nome: 'CANJICA', preco: 7.00, categoria: 'DOCES', cor_ficha: 'bg-rose-600 text-white border-rose-400', ativo: 1, imagem: '/images/canjica.png' },
         { id: 'prod_7', nome: 'CHURROS', preco: 13.00, categoria: 'DOCES', cor_ficha: 'bg-rose-600 text-white border-rose-400', ativo: 1, imagem: '/images/churros.png' },
-        { id: 'prod_8', nome: 'DOCES JUNINOS', preco: 1.00, categoria: 'DOCES', cor_ficha: 'bg-rose-600 text-white border-rose-400', ativo: 1, imagem: '/images/doces juninos.png' },
-        { id: 'prod_9', nome: 'BRIGADEIRO/BEIJINHO', preco: 5.00, categoria: 'DOCES', cor_ficha: 'bg-rose-600 text-white border-rose-400', ativo: 1, imagem: '/images/beijinho e brigadeiro.png' },
-        { id: 'prod_10', nome: 'ALGODÃO DOCE', preco: 5.00, categoria: 'DOCES', cor_ficha: 'bg-rose-600 text-white border-rose-400', ativo: 1, imagem: '/images/algodão doce.png' },
-        { id: 'prod_11', nome: 'BOLO DE POTE', preco: 10.00, categoria: 'DOCES', cor_ficha: 'bg-rose-600 text-white border-rose-400', ativo: 1, imagem: '/images/bolo de pote.png' },
-        { id: 'prod_12', nome: 'BOLO DE FATIA', preco: 5.00, categoria: 'DOCES', cor_ficha: 'bg-rose-600 text-white border-rose-400', ativo: 1, imagem: '/images/bolo de fatia.png' },
+        { id: 'prod_8', nome: 'DOCES JUNINOS', preco: 1.00, categoria: 'DOCES', cor_ficha: 'bg-rose-600 text-white border-rose-400', ativo: 1, imagem: '/images/doces-juninos.png' },
+        { id: 'prod_9', nome: 'BRIGADEIRO/BEIJINHO', preco: 5.00, categoria: 'DOCES', cor_ficha: 'bg-rose-600 text-white border-rose-400', ativo: 1, imagem: '/images/beijinho-brigadeiro.png' },
+        { id: 'prod_10', nome: 'ALGODÃO DOCE', preco: 5.00, categoria: 'DOCES', cor_ficha: 'bg-rose-600 text-white border-rose-400', ativo: 1, imagem: '/images/algodao-doce.png' },
+        { id: 'prod_11', nome: 'BOLO DE POTE', preco: 10.00, categoria: 'DOCES', cor_ficha: 'bg-rose-600 text-white border-rose-400', ativo: 1, imagem: '/images/bolo-de-pote.png' },
+        { id: 'prod_12', nome: 'BOLO DE FATIA', preco: 5.00, categoria: 'DOCES', cor_ficha: 'bg-rose-600 text-white border-rose-400', ativo: 1, imagem: '/images/bolo-de-fatia.png' },
 
         // Bebidas
-        { id: 'prod_13', nome: 'CHOCOLATE QUENTE', preco: 5.00, categoria: 'BEBIDAS', cor_ficha: 'bg-blue-600 text-white border-blue-400', ativo: 1, imagem: '/images/chocolate quente.png' },
+        { id: 'prod_13', nome: 'CHOCOLATE QUENTE', preco: 5.00, categoria: 'BEBIDAS', cor_ficha: 'bg-blue-600 text-white border-blue-400', ativo: 1, imagem: '/images/chocolate-quente.png' },
         { id: 'prod_14', nome: 'REFRIGERANTE', preco: 4.00, categoria: 'BEBIDAS', cor_ficha: 'bg-blue-600 text-white border-blue-400', ativo: 1, imagem: '/images/refrigerante.png' },
         { id: 'prod_15', nome: 'ÁGUA', preco: 4.00, categoria: 'BEBIDAS', cor_ficha: 'bg-blue-600 text-white border-blue-400', ativo: 1, imagem: '/images/agua.png' },
 
         // Jogos (Brincadeiras)
         { id: 'prod_16', nome: 'PESCARIA', preco: 6.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/pescaria.png' },
-        { id: 'prod_17', nome: 'CADEIA', preco: 1.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/cadeira.png' },
+        { id: 'prod_17', nome: 'CADEIA', preco: 1.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/cadeia.png' },
         { id: 'prod_18', nome: 'ARGOLA', preco: 6.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/argola.png' },
-        { id: 'prod_19', nome: 'BOCA DO CAIPIRA', preco: 6.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/boca do caipira.png' },
+        { id: 'prod_19', nome: 'BOCA DO CAIPIRA', preco: 6.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/boca-do-caipira.png' },
         { id: 'prod_20', nome: 'COTONETE', preco: 6.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/cotonete.png' },
-        { id: 'prod_21', nome: 'TOURO MECÂNICO', preco: 10.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/touro mecânico.png' },
+        { id: 'prod_21', nome: 'TOURO MECÂNICO', preco: 10.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/touro-mecanico.png' },
         { id: 'prod_22', nome: 'PINTURA ARTÍSTICA', preco: 5.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/jogo.png' },
       ];
 
