@@ -1123,6 +1123,21 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
                 )}
               </div>
 
+              {/* ALERTA DE ITENS ESPECIAIS (KIT FICHAS) */}
+              {cart.some(item => item.product.nome.toUpperCase().includes('KIT FICHAS')) && (
+                <div className="mx-4 mb-4 p-3 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)] animate-pulse">
+                  <div className="flex items-start gap-2">
+                    <span className="text-xl">⚠️</span>
+                    <div>
+                      <p className="text-xs font-black">AVISO IMPORTANTE!</p>
+                      <p className="text-[11px] leading-tight mt-0.5 font-medium text-amber-200/90">
+                        Lembre-se de oferecer os itens especiais destacados com estrela (⭐) para esse cliente!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* TOTAIS E CÁLCULO DE TROCO */}
               <div className="p-4 border-t border-slate-800 bg-slate-950 space-y-4">
                 
