@@ -349,6 +349,24 @@ export function AdminDashboard() {
     ? activeSession.valorAbertura + totalDinheiroCaixaAtual + totalSuprimentosCaixaAtual - totalSangriasCaixaAtual
     : 0;
 
+  // --- RESUMO DE PRODUTOS VENDIDOS (RANKING) ---
+  const aggregatedItems: Record<string, { name: string; quantity: number; revenue: number }> = {};
+  
+  sales.forEach(sale => {
+    const items = saleItemsMap[sale.id] || [];
+    items.forEach(it => {
+      if (!aggregatedItems[it.produto_id]) {
+        const prodName = products.find(p => p.id === it.produto_id)?.nome || 'Produto Indefinido';
+        aggregatedItems[it.produto_id] = { name: prodName, quantity: 0, revenue: 0 };
+      }
+      aggregatedItems[it.produto_id].quantity += it.quantidade;
+      aggregatedItems[it.produto_id].revenue += it.quantidade * it.preco_unitario;
+    });
+  });
+
+  const rankedItems = Object.values(aggregatedItems).sort((a, b) => b.quantity - a.quantity);
+  // ---------------------------------------------
+
   // Editar Produto
   const handleEditProductClick = (product: Produto) => {
     setEditingProduct(product);
@@ -828,7 +846,53 @@ export function AdminDashboard() {
           {/* TAB 3: VENDAS */}
           {activeTab === 'vendas' && (
             <div className="space-y-6">
+
+              {/* RESUMO DE PRODUTOS VENDIDOS */}
+              <div className="bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden shadow-lg print-page-break">
+                <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+                  <h3 className="text-base font-black text-amber-500">Ranking de Produtos Vendidos (Resumo Geral)</h3>
+                  <button 
+                    onClick={() => window.print()}
+                    className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition-colors flex items-center gap-2 print-hidden cursor-pointer"
+                  >
+                    <Printer size={14} /> Imprimir Resumo
+                  </button>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-slate-900 text-slate-400 text-xs font-bold uppercase border-b border-slate-800">
+                      <tr>
+                        <th className="px-6 py-3">Produto</th>
+                        <th className="px-6 py-3 text-center">Quantidade Vendida</th>
+                        <th className="px-6 py-3 text-right">Faturamento Total</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/50">
+                      {rankedItems.length === 0 ? (
+                        <tr>
+                          <td colSpan={3} className="px-6 py-8 text-center text-slate-500 font-bold">Nenhum produto vendido ainda.</td>
+                        </tr>
+                      ) : (
+                        rankedItems.map((item, idx) => (
+                          <tr key={idx} className="hover:bg-slate-900/30">
+                            <td className="px-6 py-4 font-bold text-white flex items-center gap-2">
+                              {idx === 0 && <span className="text-amber-500">🥇</span>}
+                              {idx === 1 && <span className="text-slate-400">🥈</span>}
+                              {idx === 2 && <span className="text-amber-700">🥉</span>}
+                              {idx > 2 && <span className="text-slate-600 w-4 inline-block text-center">{idx + 1}</span>}
+                              {item.name}
+                            </td>
+                            <td className="px-6 py-4 text-center font-black text-amber-500 text-lg">{item.quantity}x</td>
+                            <td className="px-6 py-4 text-right font-mono font-bold text-emerald-400">R$ {item.revenue.toFixed(2)}</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
               
+              {/* HISTÓRICO GERAL DE VENDAS (LISTAGEM DETALHADA) */}
               <div className="bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
                 <div className="px-6 py-4 border-b border-slate-800">
                   <h3 className="text-base font-black">Histórico Geral de Fichas Emitidas</h3>
