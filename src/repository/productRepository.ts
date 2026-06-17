@@ -15,7 +15,7 @@ export const productRepository = {
     }
     
     const product1 = await db.produtos.get('prod_1');
-    const needsUpdate = count !== 22 || !product1 || product1.nome !== 'PASTEL' || product1.imagem !== '/images/pastel.png';
+    const needsUpdate = count !== 25 || !product1 || product1.nome !== 'PASTEL' || product1.imagem !== '/images/pastel.png';
     
     if (needsUpdate) {
       await db.produtos.clear();
@@ -50,6 +50,9 @@ export const productRepository = {
         { id: 'prod_20', nome: 'COTONETE', preco: 6.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/cotonete.png' },
         { id: 'prod_21', nome: 'TOURO MECÂNICO', preco: 10.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/touro-mecanico.png' },
         { id: 'prod_22', nome: 'PINTURA ARTÍSTICA', preco: 5.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/pintura-artistica.png' },
+        { id: 'prod_23', nome: 'KIT FICHAS R$30', preco: 30.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/kit de fichas.png' },
+        { id: 'prod_24', nome: 'KIT FICHAS R$50', preco: 50.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/kit de fichas.png' },
+        { id: 'prod_25', nome: 'KIT FICHAS R$100', preco: 100.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/kit de fichas.png' },
       ];
 
       await db.produtos.bulkAdd(defaultProducts);
