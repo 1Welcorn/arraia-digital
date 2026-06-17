@@ -1873,12 +1873,14 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
                   <div key={idx} className="flex justify-between items-center bg-slate-900 p-3 rounded-xl border border-slate-800/50">
                     <div className="flex items-center gap-3">
                       <div 
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold shadow-inner"
-                        style={{ backgroundColor: item.product.cor_ficha || '#cbd5e1' }}
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold shadow-inner flex-shrink-0"
+                        style={{ backgroundColor: item.product.cor_ficha?.split(' ')[0]?.replace('bg-', '') || '#cbd5e1' }}
                       >
                         {item.quantity}x
                       </div>
-                      <span className="font-bold text-slate-200">{item.product.nome}</span>
+                      <span className="font-bold text-slate-200 truncate">
+                        {item.product.nome} <span className="text-slate-400 font-normal text-sm">(R$ {(item.product.preco * item.quantity).toFixed(2)})</span>
+                      </span>
                     </div>
                   </div>
                 ))}
