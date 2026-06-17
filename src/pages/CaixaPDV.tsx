@@ -1035,7 +1035,7 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
                       {/* Lado Direito: Imagem */}
                       {product.imagem && (
                         <div className={`w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-xl overflow-hidden border border-black/15 bg-slate-900/10 flex items-center justify-center shadow-inner ${inCartQty > 0 ? 'opacity-30 md:opacity-100' : ''}`}>
-                          <img src={product.imagem} alt={product.nome} className="w-full h-full object-cover" />
+                          <img src={product.imagem} alt={product.nome} className="w-full h-full object-contain drop-shadow-md scale-110" />
                         </div>
                       )}
                     </div>
