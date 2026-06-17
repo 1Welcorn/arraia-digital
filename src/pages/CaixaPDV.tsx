@@ -25,7 +25,8 @@ import {
   ChevronDown,
   Lock,
   Key,
-  Send
+  Send,
+  RefreshCw
 } from 'lucide-react';
 import { authLocalService } from '../services/authLocalService';
 import type { UserSession } from '../services/authLocalService';
@@ -44,6 +45,7 @@ import { pixService } from '../services/pixService';
 interface CartItem {
   product: Produto;
   quantity: number;
+  isKitItem?: boolean;
 }
 
 export function CaixaPDV() {
@@ -138,6 +140,13 @@ export function CaixaPDV() {
   // Mensagens
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // Kits e Trocas
+  const [kitModalOpen, setKitModalOpen] = useState(false);
+  const [trocaFichasModalOpen, setTrocaFichasModalOpen] = useState(false);
+  const [fichasDevolvidas, setFichasDevolvidas] = useState<CartItem[]>([]);
+  const [fichasNovas, setFichasNovas] = useState<CartItem[]>([]);
+  const [trocaPaymentMethod, setTrocaPaymentMethod] = useState<'DINHEIRO' | 'PIX_LOCAL' | 'CARTAO'>('DINHEIRO');
 
   // Mobile Layout
   const [isCartOpenMobile, setIsCartOpenMobile] = useState(false);
@@ -515,10 +524,10 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
     }
 
     setCart((prevCart) => {
-      const existing = prevCart.find((item) => item.product.id === product.id);
+      const existing = prevCart.find((item) => item.product.id === product.id && !item.isKitItem);
       if (existing) {
         return prevCart.map((item) =>
-          item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+          item.product.id === product.id && !item.isKitItem ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
       return [...prevCart, { product, quantity: 1 }];
@@ -527,7 +536,7 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
 
   const handleIncrementCart = (productId: string) => {
     setCart((prev) =>
-      prev.map((i) => (i.product.id === productId ? { ...i, quantity: i.quantity + 1 } : i))
+      prev.map((i) => (i.product.id === productId && !i.isKitItem ? { ...i, quantity: i.quantity + 1 } : i))
     );
   };
 
@@ -535,7 +544,7 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
     setCart((prev) =>
       prev
         .map((i) => {
-          if (i.product.id === productId) {
+          if (i.product.id === productId && !i.isKitItem) {
             return { ...i, quantity: i.quantity - 1 };
           }
           return i;
@@ -545,7 +554,27 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
   };
 
   const handleRemoveFromCart = (productId: string) => {
-    setCart((prev) => prev.filter((i) => i.product.id !== productId));
+    setCart((prev) => prev.filter((i) => !(i.product.id === productId && !i.isKitItem)));
+  };
+
+  const handleAddKitItem = (product: Produto) => {
+    setCart(prev => {
+      const existing = prev.find(item => item.product.id === product.id && item.isKitItem);
+      if (existing) {
+        return prev.map(item => item.product.id === product.id && item.isKitItem ? { ...item, quantity: item.quantity + 1 } : item);
+      }
+      return [...prev, { product, quantity: 1, isKitItem: true }];
+    });
+  };
+
+  const handleRemoveKitItem = (product: Produto) => {
+    setCart(prev => {
+      const existing = prev.find(item => item.product.id === product.id && item.isKitItem);
+      if (existing && existing.quantity > 1) {
+        return prev.map(item => item.product.id === product.id && item.isKitItem ? { ...item, quantity: item.quantity - 1 } : item);
+      }
+      return prev.filter(item => !(item.product.id === product.id && item.isKitItem));
+    });
   };
 
   const handleLogout = () => {
@@ -554,7 +583,10 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
     navigate('/login');
   };
 
-  const cartTotal = cart.reduce((acc, item) => acc + item.product.preco * item.quantity, 0);
+  const cartTotal = cart.reduce((acc, item) => {
+    if (item.isKitItem) return acc;
+    return acc + item.product.preco * item.quantity;
+  }, 0);
 
   // Troco
 
@@ -563,6 +595,61 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
       const current = parseFloat(prev.replace(',', '.')) || 0;
       return (current + amount).toString();
     });
+  };
+
+  const handleConfirmarTroca = async () => {
+    const totalDevolvidas = fichasDevolvidas.reduce((acc, item) => acc + item.product.preco * item.quantity, 0);
+    const totalNovas = fichasNovas.reduce((acc, item) => acc + item.product.preco * item.quantity, 0);
+    const diferenca = totalNovas - totalDevolvidas;
+
+    if (fichasDevolvidas.length === 0 || fichasNovas.length === 0) {
+      setError('Adicione pelo menos uma ficha devolvida e uma nova para trocar.');
+      return;
+    }
+
+    if (diferenca < 0) {
+      setError('A devolução de valor não é suportada. O valor das novas fichas deve ser maior ou igual ao das devolvidas.');
+      return;
+    }
+
+    try {
+      const items: {produtoId: string, quantidade: number, precoUnitario: number}[] = [];
+      
+      fichasDevolvidas.forEach(i => {
+        items.push({
+          produtoId: i.product.id,
+          quantidade: -i.quantity,
+          precoUnitario: i.product.preco
+        });
+      });
+
+      fichasNovas.forEach(i => {
+        items.push({
+          produtoId: i.product.id,
+          quantidade: i.quantity,
+          precoUnitario: i.product.preco
+        });
+      });
+
+      await saleRepository.createSale(
+        diferenca,
+        trocaPaymentMethod,
+        items,
+        user?.email || '',
+        undefined,
+        diferenca,
+        0
+      );
+
+      setSuccess('Troca de fichas registrada com sucesso!');
+      setTimeout(() => setSuccess(''), 4000);
+      setTrocaFichasModalOpen(false);
+      setFichasDevolvidas([]);
+      setFichasNovas([]);
+      await loadInitialData();
+    } catch (e: any) {
+      setError('Erro ao registrar a troca: ' + e.message);
+    }
   };
 
   // Finalização da Venda (Dinheiro)
@@ -586,7 +673,7 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
       const items = cart.map((item) => ({
         produtoId: item.product.id,
         quantidade: item.quantity,
-        precoUnitario: item.product.preco,
+        precoUnitario: item.isKitItem ? 0 : item.product.preco,
       }));
 
       await saleRepository.createSale(
@@ -647,7 +734,7 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
       const items = cart.map((item) => ({
         produtoId: item.product.id,
         quantidade: item.quantity,
-        precoUnitario: item.product.preco,
+        precoUnitario: item.isKitItem ? 0 : item.product.preco,
       }));
 
       const parsedPaid = parseFloat(cashPaid.replace(',', '.')) || cartTotal;
@@ -688,7 +775,7 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
       const items = cart.map((item) => ({
         produtoId: item.product.id,
         quantidade: item.quantity,
-        precoUnitario: item.product.preco,
+        precoUnitario: item.isKitItem ? 0 : item.product.preco,
       }));
 
       await saleRepository.createSale(
@@ -965,6 +1052,18 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
                           onClick={() => {
                             setIsTopAdminMenuOpen(false);
                             setError('');
+                            setFichasDevolvidas([]);
+                            setFichasNovas([]);
+                            setTrocaFichasModalOpen(true);
+                          }}
+                          className="flex items-center gap-2 text-left w-full px-3 py-2.5 text-xs font-bold text-amber-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+                        >
+                          <RefreshCw size={14} /> Trocar Fichas
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsTopAdminMenuOpen(false);
+                            setError('');
                             setSangriaValue('');
                             setSangriaReason('');
                             setSangriaModalOpen(true);
@@ -1110,9 +1209,10 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
                       <div className="flex-1 min-w-0 pr-2">
                         <p className="font-bold text-sm text-white truncate leading-tight">
                           {item.product.nome}
+                          {item.isKitItem && <span className="ml-2 text-[10px] bg-amber-500 text-slate-900 px-1.5 py-0.5 rounded font-black uppercase">Kit</span>}
                         </p>
                         <p className="text-xs text-slate-400 mt-1 font-medium">
-                          R$ {item.product.preco.toFixed(2)} x {item.quantity}
+                          {item.isKitItem ? 'R$ 0.00 (Incluso no Kit)' : `R$ ${item.product.preco.toFixed(2)} x ${item.quantity}`}
                         </p>
                       </div>
 
@@ -1147,14 +1247,22 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
               {/* ALERTA DE ITENS ESPECIAIS (KIT FICHAS) */}
               {cart.some(item => item.product.nome.toUpperCase().includes('KIT FICHAS')) && (
                 <div className="mx-4 mb-4 p-3 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)] animate-pulse">
-                  <div className="flex items-start gap-2">
-                    <span className="text-xl">⚠️</span>
-                    <div>
-                      <p className="text-xs font-black">AVISO IMPORTANTE!</p>
-                      <p className="text-[11px] leading-tight mt-0.5 font-medium text-amber-200/90">
-                        Lembre-se de oferecer os itens especiais destacados com estrela (⭐) para esse cliente!
-                      </p>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-start gap-2">
+                      <span className="text-xl">⚠️</span>
+                      <div>
+                        <p className="text-xs font-black">AVISO IMPORTANTE!</p>
+                        <p className="text-[11px] leading-tight mt-0.5 font-medium text-amber-200/90">
+                          Ofereça e registre abaixo os itens especiais com estrela (⭐).
+                        </p>
+                      </div>
                     </div>
+                    <button 
+                      onClick={() => setKitModalOpen(true)}
+                      className="px-3 py-1.5 bg-amber-500 text-slate-900 text-xs font-black rounded-lg whitespace-nowrap hover:bg-amber-400 transition-colors shadow-lg active:scale-95 cursor-pointer"
+                    >
+                      Registrar Itens
+                    </button>
                   </div>
                 </div>
               )}
@@ -1900,7 +2008,12 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
                         {item.quantity}x
                       </div>
                       <span className="font-bold text-slate-200 truncate">
-                        {item.product.nome} <span className="text-slate-400 font-normal text-sm">(R$ {(item.product.preco * item.quantity).toFixed(2)})</span>
+                        {item.product.nome} 
+                        {item.isKitItem ? (
+                          <span className="text-amber-500 font-black text-sm ml-2">(Incluso no Kit)</span>
+                        ) : (
+                          <span className="text-slate-400 font-normal text-sm ml-2">(R$ {(item.product.preco * item.quantity).toFixed(2)})</span>
+                        )}
                       </span>
                     </div>
                   </div>
@@ -2024,6 +2137,177 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
                 className="py-3 rounded-xl bg-amber-500 text-slate-950 hover:bg-amber-400 text-sm font-bold transition-all cursor-pointer"
               >
                 Salvar Pix
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE ITENS DE KIT */}
+      {kitModalOpen && (
+        <div className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+          <div className="w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900 shadow-2xl animate-scale-up flex flex-col max-h-[80vh]">
+            <div className="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/50 rounded-t-2xl">
+              <h3 className="text-lg font-black text-amber-500 flex items-center gap-2">
+                ⭐ Itens Entregues no Kit
+              </h3>
+              <button onClick={() => setKitModalOpen(false)} className="text-slate-400 hover:text-white p-1 rounded-lg">
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="p-4 overflow-y-auto flex-1">
+              <p className="text-sm text-slate-400 mb-4 font-medium leading-relaxed">
+                Adicione os itens especiais que o cliente já está pegando com as fichas do Kit. 
+                <strong className="text-white block mt-1">Eles não vão cobrar nenhum valor extra.</strong>
+              </p>
+              
+              <div className="space-y-3">
+                {products.filter(p => p.nome.includes('⭐')).map(product => {
+                  const cartItem = cart.find(i => i.product.id === product.id && i.isKitItem);
+                  const qty = cartItem ? cartItem.quantity : 0;
+                  return (
+                    <div key={product.id} className="flex justify-between items-center bg-slate-950 p-3 rounded-xl border border-slate-800">
+                      <span className="font-bold text-slate-200">{product.nome}</span>
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => handleRemoveKitItem(product)}
+                          disabled={qty === 0}
+                          className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white transition-colors"
+                        >
+                          <Minus size={16} />
+                        </button>
+                        <span className="text-base font-black w-4 text-center">{qty}</span>
+                        <button
+                          onClick={() => handleAddKitItem(product)}
+                          className="w-8 h-8 flex items-center justify-center rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-900 transition-colors"
+                        >
+                          <Plus size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            
+            <div className="p-4 border-t border-slate-800 bg-slate-950/80 rounded-b-2xl">
+              <button
+                onClick={() => setKitModalOpen(false)}
+                className="w-full py-3 rounded-xl bg-amber-500 text-slate-900 font-black text-sm hover:bg-amber-400 transition-colors shadow-lg shadow-amber-500/20 cursor-pointer"
+              >
+                Concluir Seleção
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL TROCA DE FICHAS */}
+      {trocaFichasModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+          <div className="w-full max-w-4xl rounded-2xl border border-slate-800 bg-slate-900 shadow-2xl animate-scale-up flex flex-col max-h-[90vh]">
+            <div className="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/50 rounded-t-2xl">
+              <h3 className="text-lg font-black text-amber-500 flex items-center gap-2">
+                <RefreshCw size={20} /> Troca de Fichas
+              </h3>
+              <button onClick={() => setTrocaFichasModalOpen(false)} className="text-slate-400 hover:text-white p-1 rounded-lg">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6 p-6 overflow-y-auto">
+              {/* DEVOLVIDAS */}
+              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                <h4 className="font-bold text-rose-400 mb-4 border-b border-slate-800 pb-2">1. Fichas Devolvidas (Cliente devolve)</h4>
+                <div className="max-h-60 overflow-y-auto space-y-2 pr-2">
+                  {products.filter(p => p.ativo === 1 && !p.nome.toUpperCase().includes('KIT FICHAS')).map(product => {
+                    const found = fichasDevolvidas.find(i => i.product.id === product.id);
+                    const qty = found ? found.quantity : 0;
+                    return (
+                      <div key={product.id} className="flex items-center justify-between p-2 bg-slate-900 rounded-lg">
+                        <span className="text-xs text-slate-300 font-bold truncate flex-1">{product.nome} (R$ {product.preco.toFixed(2)})</span>
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => setFichasDevolvidas(prev => {
+                            const e = prev.find(i => i.product.id === product.id);
+                            if(e && e.quantity > 1) return prev.map(i => i.product.id === product.id ? {...i, quantity: i.quantity - 1} : i);
+                            return prev.filter(i => i.product.id !== product.id);
+                          })} disabled={qty===0} className="w-6 h-6 flex items-center justify-center bg-slate-800 text-white rounded disabled:opacity-50 transition-colors"><Minus size={14} /></button>
+                          <span className="text-xs font-black w-3 text-center text-rose-400">{qty}</span>
+                          <button onClick={() => setFichasDevolvidas(prev => {
+                            const e = prev.find(i => i.product.id === product.id);
+                            if(e) return prev.map(i => i.product.id === product.id ? {...i, quantity: i.quantity + 1} : i);
+                            return [...prev, {product, quantity: 1}];
+                          })} className="w-6 h-6 flex items-center justify-center bg-rose-500/20 hover:bg-rose-500/40 text-rose-400 rounded transition-colors"><Plus size={14} /></button>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* NOVAS */}
+              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                <h4 className="font-bold text-emerald-400 mb-4 border-b border-slate-800 pb-2">2. Novas Fichas (Cliente leva)</h4>
+                <div className="max-h-60 overflow-y-auto space-y-2 pr-2">
+                  {products.filter(p => p.ativo === 1 && !p.nome.toUpperCase().includes('KIT FICHAS')).map(product => {
+                    const found = fichasNovas.find(i => i.product.id === product.id);
+                    const qty = found ? found.quantity : 0;
+                    return (
+                      <div key={product.id} className="flex items-center justify-between p-2 bg-slate-900 rounded-lg">
+                        <span className="text-xs text-slate-300 font-bold truncate flex-1">{product.nome} (R$ {product.preco.toFixed(2)})</span>
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => setFichasNovas(prev => {
+                            const e = prev.find(i => i.product.id === product.id);
+                            if(e && e.quantity > 1) return prev.map(i => i.product.id === product.id ? {...i, quantity: i.quantity - 1} : i);
+                            return prev.filter(i => i.product.id !== product.id);
+                          })} disabled={qty===0} className="w-6 h-6 flex items-center justify-center bg-slate-800 text-white rounded disabled:opacity-50 transition-colors"><Minus size={14} /></button>
+                          <span className="text-xs font-black w-3 text-center text-emerald-400">{qty}</span>
+                          <button onClick={() => setFichasNovas(prev => {
+                            const e = prev.find(i => i.product.id === product.id);
+                            if(e) return prev.map(i => i.product.id === product.id ? {...i, quantity: i.quantity + 1} : i);
+                            return [...prev, {product, quantity: 1}];
+                          })} className="w-6 h-6 flex items-center justify-center bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-400 rounded transition-colors"><Plus size={14} /></button>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 border-t border-slate-800 bg-slate-950/80 rounded-b-2xl">
+              <div className="flex justify-between items-center mb-4 text-sm font-bold bg-slate-900 p-3 rounded-xl border border-slate-800">
+                <div className="text-rose-400">Total Devolvido: R$ {fichasDevolvidas.reduce((acc, item) => acc + item.product.preco * item.quantity, 0).toFixed(2)}</div>
+                <div className="text-emerald-400">Total Novo: R$ {fichasNovas.reduce((acc, item) => acc + item.product.preco * item.quantity, 0).toFixed(2)}</div>
+                <div className={(fichasNovas.reduce((acc, item) => acc + item.product.preco * item.quantity, 0) - fichasDevolvidas.reduce((acc, item) => acc + item.product.preco * item.quantity, 0)) > 0 ? "text-amber-500" : "text-slate-300"}>
+                  Diferença: R$ {(fichasNovas.reduce((acc, item) => acc + item.product.preco * item.quantity, 0) - fichasDevolvidas.reduce((acc, item) => acc + item.product.preco * item.quantity, 0)).toFixed(2)}
+                </div>
+              </div>
+
+              {(fichasNovas.reduce((acc, item) => acc + item.product.preco * item.quantity, 0) - fichasDevolvidas.reduce((acc, item) => acc + item.product.preco * item.quantity, 0)) > 0 && (
+                <div className="mb-4 bg-amber-500/10 border border-amber-500/30 p-3 rounded-xl">
+                  <p className="text-xs font-bold text-amber-500 mb-2">Selecione a forma de pagamento da diferença:</p>
+                  <div className="flex gap-2">
+                    {['DINHEIRO', 'PIX_LOCAL', 'CARTAO'].map(method => (
+                      <button
+                        key={method}
+                        onClick={() => setTrocaPaymentMethod(method as any)}
+                        className={`flex-1 py-2 rounded-lg text-xs font-bold transition-colors ${trocaPaymentMethod === method ? 'bg-amber-500 text-slate-900' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
+                      >
+                        {method.replace('_LOCAL', '')}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <button
+                onClick={handleConfirmarTroca}
+                disabled={fichasDevolvidas.length === 0 || fichasNovas.length === 0 || (fichasNovas.reduce((acc, item) => acc + item.product.preco * item.quantity, 0) - fichasDevolvidas.reduce((acc, item) => acc + item.product.preco * item.quantity, 0)) < 0}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 text-white font-black text-sm hover:brightness-110 transition-all shadow-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {(fichasNovas.reduce((acc, item) => acc + item.product.preco * item.quantity, 0) - fichasDevolvidas.reduce((acc, item) => acc + item.product.preco * item.quantity, 0)) > 0 ? `Cobrar Diferença e Trocar` : `Confirmar Troca (Elas por Elas)`}
               </button>
             </div>
           </div>
