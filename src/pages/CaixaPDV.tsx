@@ -340,6 +340,24 @@ export function CaixaPDV() {
       const dEstimado = (activeSession?.valorAbertura || 0) + vDinheiro + tSuprimentos - tSangrias;
       const dif = parsedContado - dEstimado;
 
+      // CALCULAR RESUMO DE ITENS VENDIDOS NESTA SESSAO
+      const allItems = await db.itens_venda.toArray();
+      const sessionItemsMap: Record<string, { name: string; quantity: number }> = {};
+      sessionSales.forEach(sale => {
+        const saleItems = allItems.filter(i => i.venda_id === sale.id);
+        saleItems.forEach(it => {
+          if (!sessionItemsMap[it.produto_id]) {
+            const prodName = products.find(p => p.id === it.produto_id)?.nome || 'Produto Indefinido';
+            sessionItemsMap[it.produto_id] = { name: prodName, quantity: 0 };
+          }
+          sessionItemsMap[it.produto_id].quantity += it.quantidade;
+        });
+      });
+      const itemsRankingStr = Object.values(sessionItemsMap)
+        .sort((a, b) => b.quantity - a.quantity)
+        .map(i => `${i.quantity}x ${i.name}`)
+        .join('\n');
+
       let msgFechamento = closeNotes.trim();
       if (!msgFechamento) {
         msgFechamento = `Caixa fechado. Contado: R$ ${parsedContado.toFixed(2)} (Estimado: R$ ${dEstimado.toFixed(2)}). Divergência: R$ ${dif.toFixed(2)}.`;
@@ -378,6 +396,9 @@ Total de Sangrias (-): R$ ${tSangrias.toFixed(2)}
 2. CONTAGEM REAL (OPERADOR/GERENTE)
 Valor Contado na Gaveta: R$ ${parsedContado.toFixed(2)}
 Divergencia (Falta/Sobra): R$ ${dif.toFixed(2)}
+-------------------------------------------
+3. ITENS VENDIDOS NESTE TURNO
+${itemsRankingStr || 'Nenhum item vendido.'}
 -------------------------------------------
 Observacoes do Fechamento:
 ${msgFechamento}
