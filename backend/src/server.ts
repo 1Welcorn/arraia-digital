@@ -97,7 +97,7 @@ app.post('/api/auth/login', async (req, res) => {
 // ==========================================
 // CONFIGURAÇÕES GLOBAIS (PIX)
 // Leitura e gravação de configurações Globais (via banco)
-const DEFAULT_PIX = { key: '12345678000199', name: 'APMF ESCOLA ESTADUAL', city: 'CURITIBA' };
+const DEFAULT_PIX = { key: '77.673.945/0001-07', name: 'Associação de pais,mestres e funcionários do Colégio Estadual Nossa Senhora de Lourdes', city: 'CURITIBA' };
 
 app.get('/api/settings/pix', async (req, res) => {
   try {

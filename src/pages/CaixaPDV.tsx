@@ -127,8 +127,8 @@ export function CaixaPDV() {
   });
   
   // Configurações da Escola (Pix)
-  const [schoolPixKey, setSchoolPixKey] = useState(localStorage.getItem('pix_key') || '12345678000199');
-  const [schoolPixName, setSchoolPixName] = useState(localStorage.getItem('pix_name') || 'APMF ESCOLA ESTADUAL');
+  const [schoolPixKey, setSchoolPixKey] = useState(localStorage.getItem('pix_key') || '77.673.945/0001-07');
+  const [schoolPixName, setSchoolPixName] = useState(localStorage.getItem('pix_name') || 'Associação de pais,mestres e funcionários do Colégio Estadual Nossa Senhora de Lourdes');
   const [schoolPixCity, setSchoolPixCity] = useState(localStorage.getItem('pix_city') || 'CURITIBA');
   
   const [configPixModalOpen, setConfigPixModalOpen] = useState(false);
@@ -161,9 +161,20 @@ export function CaixaPDV() {
     }
     setUser(currentUser);
 
-    // Puxa PIX Global da API (Nuvem)
+    // Forçando o PIX correto, ignorando banco e cache antigo
+    const correctKey = '77.673.945/0001-07';
+    const correctName = 'Associação de pais,mestres e funcionários do Colégio Estadual Nossa Senhora de Lourdes';
+    const correctCity = 'CURITIBA';
+    setSchoolPixKey(correctKey);
+    setSchoolPixName(correctName);
+    setSchoolPixCity(correctCity);
+    localStorage.setItem('pix_key', correctKey);
+    localStorage.setItem('pix_name', correctName);
+    localStorage.setItem('pix_city', correctCity);
+
+    // Puxa PIX Global da API (Nuvem), mas caso seja o antigo, substitui
     apiClient.get('/settings/pix').then((res: any) => {
-      if (res.data && res.data.key) {
+      if (res.data && res.data.key && res.data.key !== '12345678000199') {
         setSchoolPixKey(res.data.key);
         setSchoolPixName(res.data.name);
         setSchoolPixCity(res.data.city);
@@ -2098,7 +2109,7 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
                   value={pixConfigEdit.key}
                   onChange={e => setPixConfigEdit({...pixConfigEdit, key: e.target.value.trim()})}
                   className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white focus:border-amber-500 focus:outline-none"
-                  placeholder="Ex: 12345678000199"
+                  placeholder="Ex: 77.673.945/0001-07"
                 />
               </div>
               <div>
