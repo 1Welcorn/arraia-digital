@@ -162,7 +162,7 @@ export function CaixaPDV() {
     setUser(currentUser);
 
     // Forçando o PIX correto, ignorando banco e cache antigo
-    const correctKey = '77.673.945/0001-07';
+    const correctKey = '77673945000107';
     const correctName = 'Associação de pais,mestres e funcionários do Colégio Estadual Nossa Senhora de Lourdes';
     const correctCity = 'CURITIBA';
     setSchoolPixKey(correctKey);
@@ -2109,7 +2109,7 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
                   value={pixConfigEdit.key}
                   onChange={e => setPixConfigEdit({...pixConfigEdit, key: e.target.value.trim()})}
                   className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white focus:border-amber-500 focus:outline-none"
-                  placeholder="Ex: 77.673.945/0001-07"
+                  placeholder="Ex: 77673945000107"
                 />
               </div>
               <div>
