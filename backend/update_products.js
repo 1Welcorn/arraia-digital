@@ -32,7 +32,10 @@ const defaultProducts = [
   { id: '20', nome: 'COTONETE', preco: 6.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/jogo.png' },
   { id: '21', nome: 'TOURO MECÂNICO', preco: 10.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/jogo.png' },
   { id: '22', nome: 'PINTURA ARTÍSTICA', preco: 5.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/jogo.png' },
-  { id: '23', nome: 'CARTELA DE BINGO', preco: 15.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/jogo.png' }
+  { id: '23', nome: 'CARTELA DE BINGO', preco: 15.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/jogo.png' },
+  { id: '25', nome: 'CORREIO ELEGANTE (1 UND)', preco: 1.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/jogo.png' },
+  { id: '26', nome: 'CORREIO ELEGANTE (2 UND)', preco: 2.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/jogo.png' },
+  { id: '27', nome: 'CORREIO ELEGANTE (4 UND)', preco: 4.00, categoria: 'JOGOS', cor_ficha: 'bg-purple-600 text-white border-purple-400', ativo: 1, imagem: '/images/jogo.png' }
 ];
 
 async function main() {
