@@ -36,6 +36,32 @@ export function calculateCRC16(str: string): string {
   return crc.toString(16).toUpperCase().padStart(4, '0');
 }
 
+// Normaliza a chave Pix para os padrões exigidos pelo Banco Central
+function normalizePixKey(key: string): string {
+  let k = key.trim();
+  
+  // Se for email, retorna minúsculo e sem pontuação a mais
+  if (k.includes('@')) return k.toLowerCase();
+  
+  // Se for EVP (chave aleatória UUID)
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(k)) return k.toLowerCase();
+  
+  // Extrai apenas números
+  let digits = k.replace(/\D/g, '');
+  
+  // Se for telefone/celular (Ex: 11999999999) - O padrão Pix exige +55 no começo
+  if (digits.length === 11) return '+55' + digits;
+  if (digits.length === 12 || digits.length === 13) {
+    if (digits.startsWith('55')) return '+' + digits;
+  }
+  
+  // Se for CPF (11) ou CNPJ (14), retorna apenas números
+  if (digits.length === 11 || digits.length === 14) return digits;
+  
+  // Se nada der match perfeitamente, tenta mandar o que o usuário digitou
+  return k;
+}
+
 export const pixService = {
   // Gera o código Pix Copia e Cola (Payload completo)
   generatePixCode(
@@ -44,15 +70,15 @@ export const pixService = {
     recebedorNome: string = 'ARRAIA DIGITAL',
     recebedorCidade: string = 'CURITIBA'
   ): string {
-    const cleanedNome = cleanString(recebedorNome).substring(0, 25);
-    const cleanedCidade = cleanString(recebedorCidade).substring(0, 15);
+    const cleanedNome = cleanString(recebedorNome).substring(0, 25) || 'LOJA';
+    const cleanedCidade = cleanString(recebedorCidade).substring(0, 15) || 'CIDADE';
 
     // 00 - Payload Format Indicator (Fixo: 01)
     const payloadFormat = formatField('00', '01');
 
     // 26 - Merchant Account Information (Contém a chave Pix)
     const gui = formatField('00', 'br.gov.bcb.pix');
-    const key = formatField('01', chavePix.trim());
+    const key = formatField('01', normalizePixKey(chavePix));
     const merchantAccountInfo = formatField('26', gui + key);
 
     // 52 - Merchant Category Code (Fixo: 0000)
