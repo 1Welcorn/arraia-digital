@@ -163,7 +163,8 @@ export function CaixaPDV() {
 
     // Puxa PIX Global da API (Nuvem) para atualizar as configurações locais se necessário
     apiClient.get('/settings/pix').then((res: any) => {
-      if (res.data && res.data.key && res.data.key !== '12345678000199') {
+      // Atualiza apenas se for uma chave válida e diferente da chave de teste/padrão
+      if (res.data && res.data.key && res.data.key !== '12345678000199' && res.data.key !== '77673945000107') {
         setSchoolPixKey(res.data.key);
         setSchoolPixName(res.data.name);
         setSchoolPixCity(res.data.city);
