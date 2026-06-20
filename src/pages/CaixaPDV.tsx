@@ -102,6 +102,7 @@ export function CaixaPDV() {
   const [ultimoRelatorioText, setUltimoRelatorioText] = useState('');
   const [ultimaVendaCart, setUltimaVendaCart] = useState<CartItem[]>([]);
   const [ultimaVendaMethod, setUltimaVendaMethod] = useState<string>('');
+  const [ultimoTrocoCalculado, setUltimoTrocoCalculado] = useState(0);
 
   // Sangria
   const [sangriaModalOpen, setSangriaModalOpen] = useState(false);
@@ -657,7 +658,9 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
   const handleFinalizarDinheiro = () => {
     if (cart.length === 0) return;
     setError('');
-    setCashPaid(''); // Reseta pro cara digitar o valor no modal
+    if (!cashPaid) {
+      setCashPaid(cartTotal.toFixed(2));
+    }
     setDinheiroModalOpen(true);
   };
 
@@ -693,6 +696,7 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
       // Limpa venda
       setUltimaVendaCart([...cart]);
       setUltimaVendaMethod('DINHEIRO');
+      setUltimoTrocoCalculado(parsedPaid - cartTotal);
       setCart([]);
       setCashPaid('');
       setDinheiroModalOpen(false);
@@ -756,6 +760,7 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
 
       setUltimaVendaCart([...cart]);
       setUltimaVendaMethod('PIX');
+      setUltimoTrocoCalculado(troco);
       setCart([]);
       setCashPaid('');
       setPixModalOpen(false);
@@ -2005,6 +2010,13 @@ ARQUIVO DE SEGURANCA GERADO LOCALMENTE - GUARDE ESTE ARQUIVO.
               <h2 className="text-3xl font-black text-white">Venda Concluída!</h2>
               <p className="text-emerald-400 font-bold mt-1 uppercase tracking-widest text-sm">Pago via {ultimaVendaMethod}</p>
             </div>
+
+            {ultimaVendaMethod === 'DINHEIRO' && ultimoTrocoCalculado > 0 && (
+              <div className="bg-emerald-900/40 rounded-xl p-4 mb-6 border border-emerald-500/30 flex justify-between items-center text-lg animate-pulse">
+                <span className="text-emerald-400 font-bold uppercase text-sm tracking-wider">Troco Devolvido:</span>
+                <span className="text-3xl font-black text-amber-400">R$ {ultimoTrocoCalculado.toFixed(2)}</span>
+              </div>
+            )}
 
             <div className="bg-slate-950 rounded-2xl border border-slate-800 p-4 mb-6 flex-1 overflow-y-auto max-h-[40vh]">
               <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 text-center">Fichas a entregar ao cliente</h3>
