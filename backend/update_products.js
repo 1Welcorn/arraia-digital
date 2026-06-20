@@ -17,6 +17,7 @@ const defaultProducts = [
   { id: '10', nome: 'ALGODÃO DOCE', preco: 5.00, categoria: 'DOCES', cor_ficha: 'bg-rose-600 text-white border-rose-400', ativo: 1, imagem: '/images/doce.png' },
   { id: '11', nome: 'BOLO DE POTE', preco: 10.00, categoria: 'DOCES', cor_ficha: 'bg-rose-600 text-white border-rose-400', ativo: 1, imagem: '/images/doce.png' },
   { id: '12', nome: 'BOLO DE FATIA', preco: 5.00, categoria: 'DOCES', cor_ficha: 'bg-rose-600 text-white border-rose-400', ativo: 1, imagem: '/images/doce.png' },
+  { id: '24', nome: 'ESPETINHO DE UVA', preco: 5.00, categoria: 'DOCES', cor_ficha: 'bg-rose-600 text-white border-rose-400', ativo: 1, imagem: '/images/doce.png' },
 
   // Bebidas
   { id: '13', nome: 'CHOCOLATE QUENTE', preco: 5.00, categoria: 'BEBIDAS', cor_ficha: 'bg-blue-600 text-white border-blue-400', ativo: 1, imagem: '/images/bebida.png' },
