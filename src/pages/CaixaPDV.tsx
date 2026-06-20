@@ -161,18 +161,7 @@ export function CaixaPDV() {
     }
     setUser(currentUser);
 
-    // Forçando o PIX correto, ignorando banco e cache antigo
-    const correctKey = '77673945000107';
-    const correctName = 'Associação de pais,mestres e funcionários do Colégio Estadual Nossa Senhora de Lourdes';
-    const correctCity = 'CURITIBA';
-    setSchoolPixKey(correctKey);
-    setSchoolPixName(correctName);
-    setSchoolPixCity(correctCity);
-    localStorage.setItem('pix_key', correctKey);
-    localStorage.setItem('pix_name', correctName);
-    localStorage.setItem('pix_city', correctCity);
-
-    // Puxa PIX Global da API (Nuvem), mas caso seja o antigo, substitui
+    // Puxa PIX Global da API (Nuvem) para atualizar as configurações locais se necessário
     apiClient.get('/settings/pix').then((res: any) => {
       if (res.data && res.data.key && res.data.key !== '12345678000199') {
         setSchoolPixKey(res.data.key);
