@@ -268,7 +268,7 @@ app.get('/api/sync/sales', authenticateToken, async (req, res) => {
     // Attach items to their respective sales manually
     const salesWithItems = sales.map(sale => ({
       ...sale,
-      items: items.filter(item => item.sale_id === sale.id)
+      itens: items.filter(item => item.sale_id === sale.id)
     }));
     
     res.json(salesWithItems);
